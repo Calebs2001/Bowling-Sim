@@ -1,13 +1,14 @@
 #pragma once
 
-class Game
+
+class Frames
 {
 private:
 
 
 
 public:
-	
+
 
 };
 

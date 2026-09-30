@@ -1,13 +1,13 @@
 #pragma once
 
-class Game
+class Scorecard
 {
 private:
 
 
 
 public:
-	
+
 
 };
 

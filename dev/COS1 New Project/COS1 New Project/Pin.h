@@ -1,20 +1,25 @@
-#pragma once
-#include <vector>
 
 class Pin
 {
 private:
-	std::vector<Pin> _pin;
+	int _pinNumber;
+	bool _standing;
 
 public:
 	// constructor
-	Pin();
+	Pin(int pinNumber);
 
 	// getters
-	bool GetPin(std::vector<Pin> pin);
+	bool GetIsStanding() const;
+
+	int GetNumber() const;
+
+	char GetDisplayPin() const;
 
 	// setters
-	void SetPin(std::vector<Pin> pin);
+	void KnockPinDown();
+
+	void SetPin();
 
 };
 

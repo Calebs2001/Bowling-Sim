@@ -2,12 +2,13 @@
 
 class Game
 {
-private:
-
-
-
 public:
-	
+	// constructor
+	Game();
+
+	// methods
+
+	void Run();
 
 };
 

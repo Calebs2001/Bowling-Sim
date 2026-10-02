@@ -1,25 +1,28 @@
-#pragma once
 #include <string>
-#include <iostream>
 
 class Bowler
 {
-private:
-	std::string _name;
-
-
 public:
 
-	// constructor
+	enum class Hand
+	{
+		Left,
+		Right
+	};
+
 	Bowler();
 
 
+	std::string GetName() const;
 
-	// getters
-	std::string GetName(std::string name);
+	Hand GetHand() const;
+
+	void SetName(const std::string& newName);
+
+	void SetHand(Hand newHand);
 
 
-	// setters
-	void SetName(std::string name);
+private:
+	std::string _name;
+	Hand _hand;
 };
-

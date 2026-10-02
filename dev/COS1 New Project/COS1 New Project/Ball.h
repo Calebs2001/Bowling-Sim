@@ -18,4 +18,3 @@ private:
 	Type _type;
 
 };
-

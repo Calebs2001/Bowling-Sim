@@ -62,4 +62,3 @@ bool Frames::IsSpare() const
 
 	return GetPinsKnockedDown() == 10;
 }
-

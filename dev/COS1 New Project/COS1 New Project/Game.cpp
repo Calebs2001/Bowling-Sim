@@ -1,28 +1,73 @@
 #include <iostream>
 #include "Game.h"
-#include "PinSet.h"
 
 Game::Game()
 {  }
 
 void Game::Run() 
 {
-	TestPinSet();
+	bool running = true;
+
+	while (running)
+	{
+		ShowMenu();
+
+		int userChoice = GetMenuChoice();
+
+		switch (userChoice)
+		{
+		case 1:
+			StartGame();
+			break;
+
+		case 2:
+			Practice();
+			break;
+
+		case 3:
+			ShowLeaderboard();
+			break;
+
+		case 4:
+			running = false;
+			break;
+		}
+	}
 }
 
-void Game::TestPinSet()
+void Game::ShowMenu()
 {
-	PinSet pins;
+	std::cout << "\n";
+	std::cout << "=========================\n";
+	std::cout << "      BOWLING GAME\n";
+	std::cout << "=========================\n";
+	std::cout << "1. Start New Game\n";
+	std::cout << "2. Practice\n";
+	std::cout << "3. Leaderboard\n";
+	std::cout << "4. Exit\n";
+}
 
-	pins.Display();
+int Game::GetMenuChoice()
+{
+	int choice;
 
-	pins.KnockDown(1);
-	pins.KnockDown(5);
-	pins.KnockDown(10);
+	std::cout << "Enter choice: ";
+	std::cin >> choice;
 
-	pins.Display();
+	return choice;
+}
 
-	pins.Reset();
+void Game::StartGame()
+{
+	std::cout << "\nStarting game\n";
+}
 
-	pins.Display();
+void Game::Practice()
+{
+	std::cout << "\nStarting practice\n";
+}
+
+void Game::ShowLeaderboard()
+{
+	std::cout << "\nLeaderboard loading\n";
 }

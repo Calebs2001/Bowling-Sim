@@ -40,7 +40,7 @@ void Game::ShowMenu()
 {
 	std::cout << "\n";
 	std::cout << "=========================\n";
-	std::cout << "      BOWLING GAME\n";
+	std::cout << "      BOWLING Sim\n";
 	std::cout << "=========================\n";
 	std::cout << "1. Start New Game\n";
 	std::cout << "2. Practice\n";

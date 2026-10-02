@@ -1,3 +1,4 @@
+#pragma once
 #include "Bowler.h"
 #include "Scorecard.h"
 #include "PinSet.h"
@@ -18,10 +19,9 @@ private:
 	PinSet _pinSet;
 
 	int GetMenuChoice();
-
 	void ShowMenu();
-
 	void StartGame();
 	void Practice();
 	void ShowLeaderboard();
+	void PlayFrames(int count);
 };

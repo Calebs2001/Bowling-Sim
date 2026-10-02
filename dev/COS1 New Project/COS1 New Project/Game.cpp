@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 #include "Game.h"
 
 Game::Game()
@@ -60,11 +61,62 @@ int Game::GetMenuChoice()
 void Game::StartGame()
 {
 	std::cout << "\nStarting game\n";
+	_scorecard.Reset();
+	PlayFrames(10); // check back with this
+	_scorecard.Display();
 }
 
 void Game::Practice()
 {
-	std::cout << "\nStarting practice\n";
+	std::cout << "\nEnter ammount of frames to practice: ";
+	int frames = 0;
+	std::cin >> frames;
+	_scorecard.Reset();
+	PlayFrames(frames);
+	_scorecard.Display();
+}
+
+void Game::PlayFrames(int count)
+{
+	for (int i = 0; 0 < count; i++)
+	{
+		Frames& frame = _scorecard.GetCurrentFrame();
+		_pinSet.Reset();
+
+		std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " ---\n";
+
+		for (int j = 0; j < 2; j++)
+		{
+			_pinSet.Display();
+
+			Roll* roll = new Roll(new Ball(Ball::Type::Spare), Roll::ThrowStyle::Straight);
+
+			int standing = _pinSet.GetStandingCount();
+			int knocked = std::rand() % (standing + 1);
+
+			int toKnock = knocked;
+			for (int p = 1; p <= 10 and toKnock > 0; p++)
+			{
+				if (_pinSet.GetIsStanding(p))
+				{
+					_pinSet.KnockDown(p);
+					--toKnock;
+				}
+			}
+
+			(*roll).SetPinsKnockedDown(knocked);
+			frame.AddRoll(roll);
+
+			std::cout << "Pins knocked down - " << knocked << " pins.\n";
+
+			if (j == 0 and frame.IsStrike())
+			{
+				std::cout << "STRIKE!\n";
+				break;
+			}
+		}
+		_scorecard.AdvanceFrame();
+	}
 }
 
 void Game::ShowLeaderboard()

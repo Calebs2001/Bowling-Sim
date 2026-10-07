@@ -26,4 +26,9 @@ private:
 	void Practice();
 	void ShowLeaderboard();
 	void PlayFrames(int count);
+
+	bool PlayRoll(Frames& frame, int rollNumber);
+	Ball::Type SelectBall();
+	Roll::ThrowStyle SelectedThrowStyle();
+	int SimulateRoll(const Ball& ball, Roll::ThrowStyle style);
 };

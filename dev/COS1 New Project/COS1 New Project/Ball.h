@@ -6,9 +6,9 @@ public:
 	enum class Type
 	{
 		Spare,
-		Peralreactive,
+		PearlReactive,
 		SolidReactive,
-		Ureathane
+		Urethane
 	};
 
 	Ball(Type ballType);

@@ -10,3 +10,4 @@ Ball::Type Ball::GetType() const
 {
 	return _type;
 }
+

@@ -1,3 +1,4 @@
+#pragma once
 
 class Ball
 {
@@ -7,12 +8,13 @@ public:
 		Spare,
 		Peralreactive,
 		SolidReactive,
-		Reathane
+		Ureathane
 	};
 
 	Ball(Type ballType);
 
 	Type GetType() const;
+
 
 private:
 	Type _type;

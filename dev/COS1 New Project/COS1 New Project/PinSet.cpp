@@ -50,6 +50,8 @@ void PinSet::KnockDown(int pinNumber)
 
 void PinSet::Display() const
 {
+	std::cout << "\nPins: ";
+
 	for (const Pin& pin : _pins)
 	{
 		if (pin.GetIsStanding())

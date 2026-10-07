@@ -2,6 +2,8 @@
 #include "Bowler.h"
 #include "Scorecard.h"
 #include "PinSet.h"
+#include "Ball.h"
+#include "Roll.h"
 
 class Game
 {

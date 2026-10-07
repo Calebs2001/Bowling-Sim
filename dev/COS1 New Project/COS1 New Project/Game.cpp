@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "ASCII.h"
 
+// Replace all ,ignore, .get, and system("cls") with a catch.
 
 Game::Game()
 {  }

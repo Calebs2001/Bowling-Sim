@@ -12,6 +12,7 @@ Game::Game()
 void Game::Run()
 {
 	bool running = true;
+	std::system("cls");
 
 	while (running)
 	{
@@ -87,31 +88,46 @@ void Game::StartGame()
 	std::cout << "Welcome " << _bowler.GetName() << " to Bowling Sim!\n";
 
 	//user is prompted and selects which hand they throw with. user enters which hand they want, set the hand, and cout get hand the user selected.
-	std::cout << "\nWhich hand do you throw with?\n";
-	std::cout << "1. Left\n";
-	std::cout << "2. Right\n";
-	std::cout << "3. Exit to Menu\n";
-	std::cout << "Choice: ";
-	std::cin >> handChoice;
+	while (true)
+	{
+		std::cout << "\nWhich hand do you throw with?\n";
+		std::cout << "1. Left\n";
+		std::cout << "2. Right\n";
+		std::cout << "3. Exit to Menu\n";
+		std::cout << "Choice: ";
+		std::cin >> handChoice;
 
-	if (handChoice == 1)
-	{
-		_bowler.SetHand(Bowler::Hand::Left);
+		// Handle valid numeric choices
+		if (handChoice == 1)
+		{
+			_bowler.SetHand(Bowler::Hand::Left);
+			break;
+		}
+		else if (handChoice == 2)
+		{
+			_bowler.SetHand(Bowler::Hand::Right);
+			break;
+		}
+		else if (handChoice == 3)
+		{
+			return;
+		}
+		else
+		{
+			try
+			{
+				throw 1;
+			}
+			catch (...)
+			{
+				std::system("cls");
+				std::cin.clear();
+				std::cin.ignore();
+				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+			}
+		}
 	}
-	else if (handChoice == 2)
-	{
-		_bowler.SetHand(Bowler::Hand::Right);
-	}
-	else if (handChoice == 3) //Exit back to the menu
-	{
-		std::system("cls");
-		return;
-	}
-	else
-	{
-		std::cout << "\nInvalid choice. Please select a number 1-2.\n";
-	}
-
+	
 	std::cout << "Great! Now press Enter to start playing";
 	std::cin.ignore();
 	std::cin.get();
@@ -261,6 +277,19 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	case Ball::Type::Urethane:
 		std::cout << "Urethane";
 		break;
+
+	default:
+		try
+		{
+			throw 1;
+		}
+		catch (...)
+		{
+			std::cin.clear();
+			std::cin.ignore();
+			std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+		}
+		break;
 	}
 
 	std::cout << "\nThrow: ";
@@ -363,7 +392,7 @@ Roll::ThrowStyle Game::SelectedThrowStyle()
 }
 
 
-
+// Gets the ball strike and spare chances and randomizes the score based on pins hit
 int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 {
 	int standing = _pinSet.GetStandingCount();

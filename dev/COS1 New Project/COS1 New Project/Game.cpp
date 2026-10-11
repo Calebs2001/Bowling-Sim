@@ -37,10 +37,16 @@ void Game::Run()
 			break;
 
 		default: // Will run in  a inifinite loop if a letter or multile numbers are entered
-			std::cout << "\nInvalid choice. Please choose a number 1-4.Press enter to try again.";
-			std::cin.ignore();
-			std:cin.get();
-			std::system("cls");
+			try
+			{
+				throw 1;
+			}
+			catch (...)
+			{
+				std::cin.clear();
+				std::cin.ignore();
+				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+			}
 			break;
 		}
 	}

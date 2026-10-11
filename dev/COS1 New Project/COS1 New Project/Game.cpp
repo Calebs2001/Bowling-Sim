@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <random>
 #include "Game.h"
 #include "ASCII.h"
 
@@ -272,7 +273,7 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 		std::cout << "Hook\n";
 	}
 
-	int knocked = SimulateRoll(*ball, throwStyle);
+	int knocked = SimulateRoll(*ball, throwStyle, rollNumber);
 
 	int standing = _pinSet.GetStandingCount();
 
@@ -363,7 +364,7 @@ Roll::ThrowStyle Game::SelectedThrowStyle()
 
 
 
-int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style)
+int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 {
 	int standing = _pinSet.GetStandingCount();
 
@@ -372,39 +373,82 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style)
 		return 0;
 	}
 
-	int minimum = 0;
-	int maximum = standing;
+	int strikeChance = 0;
+	int spareChance = standing;
 
 	switch (ball.GetType())
 	{
 	case Ball::Type::Spare:
-		maximum = standing;
+		strikeChance = 5;
+		spareChance = 80;
 		break;
 
 	case Ball::Type::PearlReactive:
-		maximum = standing;
+		strikeChance = 35;
+		spareChance = 20;
 		break;
 
 	case Ball::Type::SolidReactive:
-		maximum = standing;
+		strikeChance = 20;
+		spareChance = 50;
 		break;
 
 	case Ball::Type::Urethane:
-		maximum = standing;
+		strikeChance = 30;
+		spareChance = 50;
 		break;
 	}
 
-	if (style == Roll::ThrowStyle::Hook and maximum < 10)
+	if (style == Roll::ThrowStyle::Hook)
 	{
-		++maximum;
+		switch (ball.GetType())
+		{
+		case Ball::Type::Spare:
+			strikeChance += 0;
+			break;
+
+		case Ball::Type::PearlReactive:
+			strikeChance += 10;
+			break;
+
+		case Ball::Type::SolidReactive:
+			strikeChance += 5;
+			break;
+			
+		case Ball::Type::Urethane:
+			strikeChance += 5;
+			break;
+		}
 	}
 
-	if (maximum > standing)
+	if (strikeChance > 100) strikeChance = 100;
+	if (spareChance > 100) spareChance = 100;
+
+	static std::mt19937 rng(std::random_device{}());
+	std::uniform_int_distribution<int> chanceRoll(1, 100);
+
+	if (rollNumber == 1 and standing == 10)
 	{
-		maximum = standing;
+		if (chanceRoll(rng) <= strikeChance)
+		{
+			return 10;
+		}
+		std::uniform_int_distribution<int> pinsRoll(0, 9);
+		return pinsRoll(rng);
 	}
 
-	return minimum + (std::rand() % (maximum - minimum + 1));
+	if (rollNumber == 2)
+	{
+		if (chanceRoll(rng) <= spareChance)
+		{
+			return standing;
+		}
+		std::uniform_int_distribution<int> pinsRoll(0, standing - 1);
+		return pinsRoll(rng);
+	}
+
+	std::uniform_int_distribution<int> pinsRoll(0, standing);
+	return pinsRoll(rng);
 }
 
 

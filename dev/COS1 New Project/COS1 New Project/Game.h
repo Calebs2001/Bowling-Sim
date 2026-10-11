@@ -30,5 +30,5 @@ private:
 	bool PlayRoll(Frames& frame, int rollNumber);
 	Ball::Type SelectBall();
 	Roll::ThrowStyle SelectedThrowStyle();
-	int SimulateRoll(const Ball& ball, Roll::ThrowStyle style);
+	int SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber);
 };

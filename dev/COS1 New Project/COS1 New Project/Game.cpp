@@ -123,7 +123,7 @@ void Game::StartGame()
 				std::system("cls");
 				std::cin.clear();
 				std::cin.ignore();
-				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+				std::cout << "\nInvalid choice. Please choose a number 1-3.\n";
 			}
 		}
 	}
@@ -260,37 +260,37 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	Ball* ball = new Ball(ballType);
 	Roll* roll = new Roll(ball, throwStyle);
 
-	switch (ballType)
-	{
-	case Ball::Type::Spare:
-		std::cout << "Spare Ball";
-		break;
-
-	case Ball::Type::PearlReactive:
-		std::cout << "Pearl Reactive";
-		break;
-
-	case Ball::Type::SolidReactive:
-		std::cout << "Solid Reactive";
-		break;
-
-	case Ball::Type::Urethane:
-		std::cout << "Urethane";
-		break;
-
-	default:
-		try
+		switch (ballType)
 		{
-			throw 1;
+		case Ball::Type::Spare:
+			std::cout << "Spare Ball";
+			break;
+
+		case Ball::Type::PearlReactive:
+			std::cout << "Pearl Reactive";
+			break;
+
+		case Ball::Type::SolidReactive:
+			std::cout << "Solid Reactive";
+			break;
+
+		case Ball::Type::Urethane:
+			std::cout << "Urethane";
+			break;
+
+		default:
+			try
+			{
+				throw 1;
+			}
+			catch (...)
+			{
+				std::cin.clear();
+				std::cin.ignore();
+				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+			}
+			break;
 		}
-		catch (...)
-		{
-			std::cin.clear();
-			std::cin.ignore();
-			std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
-		}
-		break;
-	}
 
 	std::cout << "\nThrow: ";
 	if (throwStyle == Roll::ThrowStyle::Straight)

@@ -90,7 +90,7 @@ void Game::StartGame()
 	//user is prompted and selects which hand they throw with. user enters which hand they want, set the hand, and cout get hand the user selected.
 	while (true)
 	{
-		std::cout << "\nWhich hand do you throw with?\n";
+		std::cout << "\nWhich hand do you throw with? Enter a number 1-3\n";
 		std::cout << "1. Left\n";
 		std::cout << "2. Right\n";
 		std::cout << "3. Exit to Menu\n";
@@ -165,7 +165,8 @@ void Game::Practice()
 void Game::PlayFrames(int count)
 {
 	bool playing = true;
-	if (count < 1)
+
+	if (count < 1) // if frames left is less than one returns and moves on to show scorecard
 	{
 		return;
 	}
@@ -175,7 +176,6 @@ void Game::PlayFrames(int count)
 		count = 10;
 	}
 
-	// Needs to run until the end of the 10th frame. Or until the user chooses to quit the game back to the menu at anytime
 	for (int i = 0; i < count and playing; i++) // rotates through number of frames. 10 for the game, and count number for practice
 	{
 		Frames& frame = _scorecard.GetCurrentFrame(); // shows the scorcard for that frame
@@ -188,15 +188,16 @@ void Game::PlayFrames(int count)
 		std::cout << "============================\n";
 		std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
 
-		// Add in user option to pick a ball, roll stright or hook, or to exit the game back to the menu. clear screen after sleection
+		// First roll of frame
 		bool continuePlaying = PlayRoll(frame, 1);
 
-		if (!continuePlaying)
+		if (!continuePlaying) // quit playing
 		{
 			std::cout << "\nReturning to menu.";
 			return;
 		}
 
+		// second roll if user doesn't strike
 		if (!frame.IsStrike())
 		{
 			continuePlaying = PlayRoll(frame, 2);
@@ -217,6 +218,7 @@ void Game::PlayFrames(int count)
 			std::cout << "\nSTRIKE!\n";
 		}
 
+		// Outputs the frame number and gets how many pins were knocked down to display to the user then advances to the next frame with a lear screen
 		std::cout << "\nFrame" << frame.GetFrameNumber() << " total pins: " << frame.GetPinsKnockedDown() << "\n";
 		std::cout << "Press Enter to continue";
 		std::cin.ignore();
@@ -229,22 +231,24 @@ void Game::PlayFrames(int count)
 			_scorecard.AdvanceFrame();
 		}
 	}
-
+	// End of game, shows to total number of pins the user got for their score.
 	std::cout << "\nFinal score: " << _scorecard.GetTotalScore() << "\n";
 }
 
+// Gets the user input on if they want to rool. Which ball to use, and how to throw the ball
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
 	int choice;
 	std::cout << "Roll " << rollNumber << "\n";
 
-	std::cout << "\nWhat would you like to do?\n";
+	std::cout << "\nWhat would you like to do? Enter a number 1-2\n";
 	std::cout << "1. Choose ball and roll\n";
 	std::cout << "2. Exit game to menu\n";
 	std::cout << "Choice: ";
 	std::cin >> choice;
 
-	if (choice == 2)
+	////// Add catch all user input vlaidation/////////
+	if (choice == 2) 
 	{
 		return false;
 	}
@@ -260,6 +264,7 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	Ball* ball = new Ball(ballType);
 	Roll* roll = new Roll(ball, throwStyle);
 
+	// Select ball
 		switch (ballType)
 		{
 		case Ball::Type::Spare:
@@ -277,21 +282,9 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 		case Ball::Type::Urethane:
 			std::cout << "Urethane";
 			break;
-
-		default:
-			try
-			{
-				throw 1;
-			}
-			catch (...)
-			{
-				std::cin.clear();
-				std::cin.ignore();
-				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
-			}
-			break;
 		}
 
+	// Select how to throw
 	std::cout << "\nThrow: ";
 	if (throwStyle == Roll::ThrowStyle::Straight)
 	{
@@ -302,17 +295,16 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 		std::cout << "Hook\n";
 	}
 
+	// Is an int because need the number of knocked pins but using the simulation method
 	int knocked = SimulateRoll(*ball, throwStyle, rollNumber);
-
+	// is an int because need to know the number of standing pins from the PinSet class
 	int standing = _pinSet.GetStandingCount();
 
-	if (knocked > standing)
-	{
-		knocked = standing;
-	}
-
+	//initalize the number of pins knocked down to 0
 	int knockedDown = 0;
 
+	// As lomng a 1 pin is less than or equal to 10 and the number od knocked down pins is less than
+	// the number of pins knocked from the simulation, then add how the number of pins knocked down.
 	for (int pin = 1; pin <= 10 and knockedDown < knocked; pin++)
 	{
 		if (_pinSet.GetIsStanding(pin))
@@ -323,6 +315,7 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	}
 
 	(*roll).SetPinsKnockedDown(knockedDown);
+	// adds the second roll for the frame
 	frame.AddRoll(roll);
 
 	std::cout << "\nPins left standing\n";
@@ -332,13 +325,12 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	return true;
 }
 
-
-
+// Ball selection menu
 Ball::Type Game::SelectBall()
 {
 	int choice;
 
-	std::cout << "\nChoose your ball:\n";
+	std::cout << "\nChoose your ball. Enter a number 1-4\n";
 	std::cout << "1. Spare Ball\n";
 	std::cout << "2. Pearl Reactive\n";
 	std::cout << "3. Solid Reactive\n";
@@ -361,13 +353,22 @@ Ball::Type Game::SelectBall()
 		return Ball::Type::Urethane;
 
 	default:
-		std::cout << "\nInvalid choice. Enter a number 1-4.\n";
+		try
+		{
+			throw 1;
+		}
+		catch (...)
+		{
+			std::cin.clear();
+			std::cin.ignore();
+			std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+		}
 		break;
 	}
 }
 
 
-
+// How to throw the ball menu selection
 Roll::ThrowStyle Game::SelectedThrowStyle()
 {
 	int choice;
@@ -402,9 +403,11 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		return 0;
 	}
 
+	// Initalize strike and spare chance
 	int strikeChance = 0;
 	int spareChance = standing;
 
+	// Sets the chance of a strike or spare for each ball
 	switch (ball.GetType())
 	{
 	case Ball::Type::Spare:
@@ -428,6 +431,8 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		break;
 	}
 
+	// increases the chance to strike or does nothing to ball if the user chooses to hook
+	// Might want to add it subtracting spare chance to some of the balls
 	if (style == Roll::ThrowStyle::Hook)
 	{
 		switch (ball.GetType())
@@ -450,9 +455,11 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		}
 	}
 
+	// Makes sure strike and spare chance don't go over 100
 	if (strikeChance > 100) strikeChance = 100;
 	if (spareChance > 100) spareChance = 100;
 
+	// Random seed generator so the game isn't repetative
 	static std::mt19937 rng(std::random_device{}());
 	std::uniform_int_distribution<int> chanceRoll(1, 100);
 
@@ -481,7 +488,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 }
 
 
-
+// Outputs the leaderboard of player name and their scoere. Will need File I/O for this
 void Game::ShowLeaderboard()
 {
 	std::cout << "\nLeaderboard loading\n";

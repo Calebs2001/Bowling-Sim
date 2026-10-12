@@ -151,6 +151,7 @@
     <ClCompile Include="Scorecard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ASCII.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Bowler.h" />
     <ClInclude Include="Frames.h" />

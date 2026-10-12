@@ -30,7 +30,10 @@ int Frames::GetPinsKnockedDown() const
 
 	for (const Roll* roll : _rolls)
 	{
-		total += (*roll).GetPinsKnockedDown();
+		if (roll != nullptr)
+		{
+			total += (*roll).GetPinsKnockedDown();
+		}
 	}
 	return total;
 }

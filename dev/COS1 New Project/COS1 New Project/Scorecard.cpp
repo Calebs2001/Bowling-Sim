@@ -62,7 +62,7 @@ void Scorecard::Display() const
 
 void Scorecard::AdvanceFrame()
 {
-	if (_currentFrame < 9)
+	if (_currentFrame < static_cast<int>(_frames.size()) - 1)
 	{
 		++_currentFrame;
 	}

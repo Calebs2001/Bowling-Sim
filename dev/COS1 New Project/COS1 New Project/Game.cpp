@@ -23,6 +23,7 @@ void Game::Run()
 		switch (userChoice)
 		{
 		case 1:
+			std::system("cls");
 			StartGame();
 			break;
 
@@ -31,6 +32,7 @@ void Game::Run()
 			break;
 
 		case 3:
+			std::system("cls");
 			ShowLeaderboard();
 			break;
 
@@ -110,6 +112,7 @@ void Game::StartGame()
 		}
 		else if (handChoice == 3)
 		{
+			std::system("cls");
 			return;
 		}
 		else
@@ -141,7 +144,9 @@ void Game::StartGame()
 	std::cout << "\nFinal Scorecard:\n";
 	_scorecard.Display();
 	std::cout << "\nPress Enter to return to the menu.";
+	std::cin.ignore();
 	std::cin.get();
+	std::system("cls");
 }
 
 void Game::Practice()
@@ -160,6 +165,7 @@ void Game::Practice()
 
 	std::cout << "\nPress Enter to return to the menu.";
 	std::cin.get();
+	std::system("cls");
 }
 
 void Game::PlayFrames(int count)
@@ -193,18 +199,22 @@ void Game::PlayFrames(int count)
 
 		if (!continuePlaying) // quit playing
 		{
-			std::cout << "\nReturning to menu.";
+			std::system("cls");
 			return;
 		}
 
 		// second roll if user doesn't strike
 		if (!frame.IsStrike())
 		{
+			std::cout << "\nPress Enter for second roll!";
+			std::cin.ignore();
+			std::cin.get();
+			std::system("cls");
 			continuePlaying = PlayRoll(frame, 2);
 
 			if (!continuePlaying)
 			{
-				std::cout << "\nReturning to menu.";
+				std::system("cls");
 				return;
 			}
 
@@ -223,7 +233,6 @@ void Game::PlayFrames(int count)
 		std::cout << "Press Enter to continue";
 		std::cin.ignore();
 		std::cin.get();
-
 		std::system("cls");
 
 		if (i < count - 1)
@@ -231,8 +240,6 @@ void Game::PlayFrames(int count)
 			_scorecard.AdvanceFrame();
 		}
 	}
-	// End of game, shows to total number of pins the user got for their score.
-	std::cout << "\nFinal score: " << _scorecard.GetTotalScore() << "\n";
 }
 
 // Gets the user input on if they want to rool. Which ball to use, and how to throw the ball
@@ -439,18 +446,22 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		{
 		case Ball::Type::Spare:
 			strikeChance += 0;
+			spareChance -= 2;
 			break;
 
 		case Ball::Type::PearlReactive:
 			strikeChance += 10;
+			spareChance -= 10;
 			break;
 
 		case Ball::Type::SolidReactive:
 			strikeChance += 5;
+			spareChance -= 5;
 			break;
 			
 		case Ball::Type::Urethane:
 			strikeChance += 5;
+			spareChance -= 10;
 			break;
 		}
 	}

@@ -20,6 +20,8 @@ public:
 
 	int GetPinsKnockedDown() const;
 
+	int GetRollPins(int rollIndex) const;
+
 	void AddRoll(Roll* roll);
 
 	bool IsStrike() const;

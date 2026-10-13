@@ -12,6 +12,8 @@ public:
 
 	Roll(Ball* selectedBall, ThrowStyle selectedStyle);
 
+	~Roll();
+
 	Ball* GetBall() const;
 
 	ThrowStyle GetStyle() const;

@@ -24,11 +24,66 @@ int Scorecard::GetCurrentFrameNumber() const
 
 int Scorecard::GetTotalScore() const
 {
-	int total = 0;
+	std::vector<int> rolls;
 
 	for (const Frames& frame : _frames)
 	{
-		total += frame.GetPinsKnockedDown();
+		for (int i = 0; i < frame.GetRollCount(); ++i)
+		{
+			rolls.push_back(frame.GetRollPins(i));
+		}
+	}
+
+	int total = 0;
+	int rollIndex = 0;
+	const int rollCount = static_cast<int>(rolls.size());
+
+	for (int frameIndex = 0; frameIndex < 10; ++frameIndex)
+	{
+		if (rollIndex >= rollCount)
+		{
+			break;
+		}
+
+		int firstRoll = rolls[rollIndex];
+
+		if (firstRoll == 10)
+		{
+			if (rollIndex + 2 >= rollCount)
+			{
+				break;
+			}
+
+			total += 10 + rolls[rollIndex + 1] + rolls[rollIndex + 2];
+
+			++rollIndex;
+		}
+		else
+		{
+			if (rollIndex + 1 >= rollCount)
+			{
+				break;
+			}
+
+			int secondRoll = rolls[rollIndex + 1];
+
+			if (firstRoll + secondRoll == 10)
+			{
+				if (rollIndex + 2 >= rollCount)
+				{
+					break;
+				}
+
+				total += 10 + rolls[rollIndex + 2];
+			}
+			else
+			{
+				total += firstRoll + secondRoll;
+			}
+
+			rollIndex += 2;
+		}
+
 	}
 	return total;
 }

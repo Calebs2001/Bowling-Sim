@@ -59,8 +59,7 @@ void Game::Run()
 			}
 			catch (...)
 			{
-				std::cin.clear();
-				std::cin.ignore();
+
 				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
 			}
 			break;

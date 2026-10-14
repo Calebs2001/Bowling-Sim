@@ -96,7 +96,9 @@ void Game::StartGame()
 
 	// user is prompted to enter their name and Bowler name is set then returned
 	std::cout << "Starting game\n";
+	setColor(BRIGHT_WHITE);
 	std::cout << "Enter a name: ";
+	setColor(WHITE);
 	std::cin >> userName;
 	_bowler.SetName(userName);
 	std::cout << "Welcome " << _bowler.GetName() << " to Bowling Sim!\n";
@@ -105,6 +107,7 @@ void Game::StartGame()
 	while (true)
 	{
 		std::cout << "\nWhich hand do you throw with? Enter a number 1-3:\n";
+		setColor(BRIGHT_WHITE);
 		std::cout << "1. Left\n";
 		std::cout << "2. Right\n";
 		setColor(RED);
@@ -155,8 +158,11 @@ void Game::StartGame()
 	_scorecard.Reset();
 	PlayFrames(10); 
 
+	setColor(BRIGHT_WHITE);
 	std::cout << "\nFinal Scorecard:\n";
+	setColor(YELLOW);
 	_scorecard.Display();
+	setColor(WHITE);
 	std::cout << "\nPress Enter to return to the Menu.";
 	EnterScreenClear();
 }
@@ -197,11 +203,12 @@ void Game::PlayFrames(int count)
 		// cout bowler name with each frame
 		setColor(YELLOW);
 		std::cout << "Scorecard:\n";
-		setColor(WHITE);
+		setColor(CYAN);
 		std::cout << "Bowler: " << _bowler.GetName();
 		std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " of " << count << " ---\n";
 		std::cout << "============================\n";
 		std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
+		setColor(WHITE);
 
 		// First roll of frame
 		bool continuePlaying = PlayRoll(frame, 1);
@@ -276,7 +283,7 @@ void Game::PlayFrames(int count)
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
 	int choice;
-	setColor(GREEN);
+	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";
 	setColor(WHITE);
 
@@ -488,7 +495,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		{
 		case Ball::Type::Spare:
 			strikeChance += 0;
-			spareChance -= 15;
+			spareChance -= 25;
 			break;
 
 		case Ball::Type::PearlReactive:

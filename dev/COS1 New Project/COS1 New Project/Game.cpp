@@ -3,8 +3,7 @@
 #include <random>
 #include "Game.h"
 #include "ASCII.h"
-
-// Replace all ,ignore, .get, and system("cls") with a catch for user input verification.
+#include "Input.h"
 
 Game::Game()
 {  }
@@ -16,7 +15,6 @@ void ClearScreen()
 
 void EnterScreenClear()
 {
-	std::cin.ignore();
 	std::cin.get();
 	ClearScreen();
 }
@@ -30,7 +28,7 @@ void Game::Run()
 	{
 		ShowMenu();
 
-		int userChoice = GetMenuChoice();
+		int userChoice = Input::GetNumber("\nEnter a mneu option number 1-4: ", 1, 4);
 
 		switch (userChoice)
 		{
@@ -52,16 +50,8 @@ void Game::Run()
 			running = false;
 			break;
 
-		default: // Will run in  a inifinite loop if a letter or multile numbers are entered
-			try
-			{
-				throw 1;
-			}
-			catch (...)
-			{
-
-				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
-			}
+		default: 
+			std::cout << "Invalid option. Please enter a number 1-4.\n";
 			break;
 		}
 	}
@@ -77,28 +67,14 @@ void Game::ShowMenu()
 	std::cout << "4. Exit\n";
 }
 
-int Game::GetMenuChoice()
-{
-	int choice;
-
-	std::cout << "Enter a number choice 1-4: ";
-	std::cin >> choice;
-
-	return choice;
-}
 
 void Game::StartGame()
 {
-	// Get the Bowler name and store it, and get the hand the Bowler throws with and store it.
-	int handChoice;
-	std::string userName;
-
 	// user is prompted to enter their name and Bowler name is set then returned
 	std::cout << "Starting game\n";
 	setColor(BRIGHT_WHITE);
-	std::cout << "Enter a name: ";
+	std::string userName = Input::GetString("Enter a name: ");
 	setColor(WHITE);
-	std::cin >> userName;
 	_bowler.SetName(userName);
 	std::cout << "Welcome " << _bowler.GetName() << " to Bowling Sim!\n";
 
@@ -112,8 +88,7 @@ void Game::StartGame()
 		setColor(RED);
 		std::cout << "3. Exit to Menu\n";
 		setColor(WHITE);
-		std::cout << "Choice: ";
-		std::cin >> handChoice;
+		int handChoice = Input::GetNumber("Enter a number 1-3: ", 1, 3);
 
 		// Handle valid numeric choices
 		if (handChoice == 1)
@@ -131,24 +106,9 @@ void Game::StartGame()
 			ClearScreen();
 			return;
 		}
-		else
-		{
-			try
-			{
-				throw 1;
-			}
-			catch (...)
-			{
-				ClearScreen();
-				std::cin.clear();
-				std::cin.ignore();
-				std::cout << "\nInvalid choice. Please choose a number 1-3.\n";
-			}
-		}
 	}
 	
 	std::cout << "Great! Now press Enter to start playing!";
-	std::cin.ignore();
 	std::cin.get();
 
 	ClearScreen();
@@ -281,19 +241,16 @@ void Game::PlayFrames(int count)
 // Gets the user input on if they want to rool. Which ball to use, and how to throw the ball
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
-	int choice;
 	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";
 	setColor(WHITE);
 
-	std::cout << "\nWhat would you like to do? Enter a number 1-2:\n";
 	setColor(YELLOW);
 	std::cout << "1. Choose ball and roll\n";
 	setColor(RED);
 	std::cout << "2. Exit to Menu\n";
 	setColor(WHITE);
-	std::cout << "Choice: ";
-	std::cin >> choice;
+	int choice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
 
 	////// Add catch all user input vlaidation/////////
 	if (choice == 2) 
@@ -376,18 +333,15 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 // Ball selection menu
 Ball::Type Game::SelectBall()
 {
-	int choice;
 	while (true)
 	{
-		std::cout << "\nChoose your ball. Enter a number 1-4:\n";
 		setColor(YELLOW);
 		std::cout << "1. Spare Ball\n";
 		std::cout << "2. Pearl Reactive\n";
 		std::cout << "3. Solid Reactive\n";
 		std::cout << "4. Urethane\n";
 		setColor(WHITE);
-		std::cout << "Choice: ";
-		std::cin >> choice;
+		int choice = Input::GetNumber("Enter a number 1-4: ", 1, 4);
 
 
 		switch (choice)
@@ -405,16 +359,7 @@ Ball::Type Game::SelectBall()
 			return Ball::Type::Urethane;
 
 		default:
-			try
-			{
-				throw 1;
-			}
-			catch (...)
-			{
-				std::cin.clear();
-				std::cin.ignore();
-				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
-			}
+			std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
 			break;
 		}
 	}
@@ -424,27 +369,20 @@ Ball::Type Game::SelectBall()
 // How to throw the ball menu selection
 Roll::ThrowStyle Game::SelectedThrowStyle()
 {
-	int choice;
-
-	std::cout << "\nEnter a number 1-2 for your throw:\n";
-	setColor(YELLOW);
+	setColor(BRIGHT_WHITE);
 	std::cout << "1. Straight\n";
 	std::cout << "2. Hook\n";
-	setColor(WHITE);
-	std::cout << "Choice: ";
-	std::cin >> choice;
+	
+	int choice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
 
 	if (choice == 1)
 	{
 		return Roll::ThrowStyle::Straight;
 	}
-
 	if (choice == 2)
 	{
 		return Roll::ThrowStyle::Hook;
 	}
-
-	std::cout << "\nInvalid choice. Please enter a number 1-2.\n";
 }
 
 

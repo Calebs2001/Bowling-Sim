@@ -4,6 +4,7 @@
 #include "PinSet.h"
 #include "Ball.h"
 #include "Roll.h"
+#include "Input.h"
 
 class Game
 {
@@ -20,7 +21,6 @@ private:
 	Scorecard _scorecard;
 	PinSet _pinSet;
 
-	int GetMenuChoice();
 	void ShowMenu();
 	void StartGame();
 	void Practice();

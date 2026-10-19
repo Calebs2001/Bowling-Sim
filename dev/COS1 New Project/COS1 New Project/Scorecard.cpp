@@ -24,11 +24,66 @@ int Scorecard::GetCurrentFrameNumber() const
 
 int Scorecard::GetTotalScore() const
 {
-	int total = 0;
+	std::vector<int> rolls;
 
 	for (const Frames& frame : _frames)
 	{
-		total += frame.GetPinsKnockedDown();
+		for (int i = 0; i < frame.GetRollCount(); ++i)
+		{
+			rolls.push_back(frame.GetRollPins(i));
+		}
+	}
+
+	int total = 0;
+	int rollIndex = 0;
+	const int rollCount = static_cast<int>(rolls.size());
+
+	for (int frameIndex = 0; frameIndex < 10; ++frameIndex)
+	{
+		if (rollIndex >= rollCount)
+		{
+			break;
+		}
+
+		int firstRoll = rolls[rollIndex];
+
+		if (firstRoll == 10)
+		{
+			if (rollIndex + 2 >= rollCount)
+			{
+				break;
+			}
+
+			total += 10 + rolls[rollIndex + 1] + rolls[rollIndex + 2];
+
+			++rollIndex;
+		}
+		else
+		{
+			if (rollIndex + 1 >= rollCount)
+			{
+				break;
+			}
+
+			int secondRoll = rolls[rollIndex + 1];
+
+			if (firstRoll + secondRoll == 10)
+			{
+				if (rollIndex + 2 >= rollCount)
+				{
+					break;
+				}
+
+				total += 10 + rolls[rollIndex + 2];
+			}
+			else
+			{
+				total += firstRoll + secondRoll;
+			}
+
+			rollIndex += 2;
+		}
+
 	}
 	return total;
 }
@@ -47,17 +102,104 @@ void Scorecard::Reset()
 
 void Scorecard::Display() const
 {
-	std::cout << "\n=========================\n";
-	std::cout << "        SCORECARD\n";
-	std::cout << "=========================\n";
+	std::cout << "\n======================== SCORECARD ========================\n";
+	std::vector<int> rolls;
 
 	for (const Frames& frame : _frames)
 	{
-		std::cout << "Frame " << frame.GetFrameNumber() << ": " << frame.GetPinsKnockedDown() << " pins\n";
+		for (int i = 0; i < frame.GetRollCount(); ++i)
+		{
+			rolls.push_back(frame.GetRollPins(i));
+		}
 	}
 
-	std::cout << "-------------------------\n";
-	std::cout << "Total Score: " << GetTotalScore() << "\n";
+	std::vector<int> frameScores(10, 0);
+	std::vector<bool> scoreReady(10, false);
+
+	int total = 0;
+	int rollIndex = 0;
+	int rollCount = static_cast<int>(rolls.size());
+
+	for (int frameIndex = 0; frameIndex < 10; ++frameIndex)
+	{
+		if (rollIndex >= rollCount)
+			break;
+
+		int firstRoll = rolls[rollIndex];
+
+		if (firstRoll == 10)
+		{
+			if (rollIndex + 2 >= rollCount)
+				break;
+
+			total += 10 + rolls[rollIndex + 1] + rolls[rollIndex + 2];
+			++rollIndex;
+		}
+		else
+		{
+			if (rollIndex + 1 >= rollCount)
+				break;
+
+			int secondRoll = rolls[rollIndex + 1];
+
+			if (firstRoll + secondRoll == 10)
+			{
+				if (rollIndex + 2 >= rollCount)
+					break;
+
+				total += 10 + rolls[rollIndex + 2];
+			}
+			else
+			{
+				total += firstRoll + secondRoll;
+			}
+
+			rollIndex += 2;
+		}
+		frameScores[frameIndex] = total;
+		scoreReady[frameIndex] = true;
+	}
+	for (const Frames& frame : _frames)
+	{
+		int frameNumber = frame.GetFrameNumber();
+		int count = frame.GetRollCount();
+
+		std::cout << "\nFrame " << frameNumber << ": ";
+
+		if (count == 0)
+		{
+			std::cout << "-";
+		}
+		else
+		{
+			int first = frame.GetRollPins(0);
+
+			if (first == 10)
+			{
+				std::cout << "X (Strike)";
+			}
+			else
+			{
+				std::cout << first;
+
+				if (count >= 2)
+				{
+					int second = frame.GetRollPins(1);
+
+					if (first + second == 10)
+						std::cout << " / (Spare)";
+					else
+						std::cout << " " << second;
+				}
+			}
+		}
+		if (scoreReady[frameNumber - 1])
+			std::cout << " | Score: " << frameScores[frameNumber - 1];
+		else
+			std::cout << " | Score: Pending";
+	}
+	std::cout << "\n-----------------------------------------------------------\n";
+	std::cout << "Final Total: " << GetTotalScore() << "\n";
 }
 
 void Scorecard::AdvanceFrame()

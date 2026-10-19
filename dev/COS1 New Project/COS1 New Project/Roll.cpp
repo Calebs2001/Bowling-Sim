@@ -6,6 +6,11 @@ Roll::Roll(Ball* selectedBall, ThrowStyle selectedStyle) :
 
 }
 
+Roll::~Roll()
+{
+	_ball = nullptr;
+}
+
 Ball* Roll::GetBall() const
 {
 	return _ball;
@@ -25,4 +30,3 @@ void Roll::SetPinsKnockedDown(int pins)
 {
 	_pinsKnockedDown = pins;
 }
-

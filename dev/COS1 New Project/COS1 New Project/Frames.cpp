@@ -38,6 +38,21 @@ int Frames::GetPinsKnockedDown() const
 	return total;
 }
 
+int Frames::GetRollPins(int rollIndex) const
+{
+	if (rollIndex < 0 or rollIndex >= static_cast<int>(_rolls.size()))
+	{
+		return 0;
+	}
+
+	if (_rolls[rollIndex] == nullptr)
+	{
+		return 0;
+	}
+
+	return (*_rolls[rollIndex]).GetPinsKnockedDown();
+}
+
 void Frames::AddRoll(Roll* roll)
 {
 	if (roll != nullptr)
@@ -58,10 +73,10 @@ bool Frames::IsStrike() const
 
 bool Frames::IsSpare() const
 {
-	if (_rolls.size() != 2)
+	if (_rolls.size() < 2)
 	{
 		return false;
 	}
 
-	return GetPinsKnockedDown() == 10;
+	return GetRollPins(0) != 10 and GetRollPins(0) + GetRollPins(1) == 10;
 }

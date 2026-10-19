@@ -143,6 +143,7 @@
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Bowler.cpp" />
     <ClCompile Include="Frames.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Pin.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Bowler.h" />
     <ClInclude Include="Frames.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Pin.h" />
     <ClInclude Include="PinSet.h" />
     <ClInclude Include="Roll.h" />

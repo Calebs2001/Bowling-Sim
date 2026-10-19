@@ -3,26 +3,54 @@
 #include <random>
 #include "Game.h"
 #include "ASCII.h"
+#include "Input.h"
 
-// Replace all ,ignore, .get, and system("cls") with a catch.
-
-Game::Game()
+Game::Game() :
+	_balls{ Ball(Ball::Type::Spare),
+			Ball(Ball::Type::PearlReactive),
+			Ball(Ball::Type::SolidReactive),
+			Ball(Ball::Type::Urethane)
+			}
 {  }
+
+Ball& Game::GetBallByType(Ball::Type type)
+{
+	for (Ball& ball : _balls)
+	{
+		if (ball.GetType() == type)
+		{
+			return ball;
+		}
+	}
+	return _balls[0];
+}
+
+void ClearScreen()
+{
+	std::system("cls");
+}
+
+void EnterScreenClear()
+{
+	std::cin.get();
+	ClearScreen();
+}
 
 void Game::Run()
 {
 	bool running = true;
-	std::system("cls");
+	ClearScreen();
 
 	while (running)
 	{
 		ShowMenu();
 
-		int userChoice = GetMenuChoice();
+		int userChoice = Input::GetNumber("\nEnter a mneu option number 1-4: ", 1, 4);
 
 		switch (userChoice)
 		{
 		case 1:
+			ClearScreen();
 			StartGame();
 			break;
 
@@ -31,6 +59,7 @@ void Game::Run()
 			break;
 
 		case 3:
+			ClearScreen();
 			ShowLeaderboard();
 			break;
 
@@ -38,17 +67,8 @@ void Game::Run()
 			running = false;
 			break;
 
-		default: // Will run in  a inifinite loop if a letter or multile numbers are entered
-			try
-			{
-				throw 1;
-			}
-			catch (...)
-			{
-				std::cin.clear();
-				std::cin.ignore();
-				std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
-			}
+		default: 
+			std::cout << "Invalid option. Please enter a number 1-4.\n";
 			break;
 		}
 	}
@@ -64,38 +84,28 @@ void Game::ShowMenu()
 	std::cout << "4. Exit\n";
 }
 
-int Game::GetMenuChoice()
-{
-	int choice;
-
-	std::cout << "Enter a number choice 1-4: ";
-	std::cin >> choice;
-
-	return choice;
-}
 
 void Game::StartGame()
 {
-	// Get the Bowler name and store it, and get the hand the Bowler throws with and store it.
-	int handChoice;
-	std::string userName;
-
 	// user is prompted to enter their name and Bowler name is set then returned
-	std::cout << "\nStarting game\n";
-	std::cout << "Enter a name: ";
-	std::cin >> userName;
+	std::cout << "Starting game\n";
+	setColor(BRIGHT_WHITE);
+	std::string userName = Input::GetString("Enter a name: ");
+	setColor(WHITE);
 	_bowler.SetName(userName);
 	std::cout << "Welcome " << _bowler.GetName() << " to Bowling Sim!\n";
 
 	//user is prompted and selects which hand they throw with. user enters which hand they want, set the hand, and cout get hand the user selected.
 	while (true)
 	{
-		std::cout << "\nWhich hand do you throw with? Enter a number 1-3\n";
+		std::cout << "\nWhich hand do you throw with? Enter a number 1-3:\n";
+		setColor(BRIGHT_WHITE);
 		std::cout << "1. Left\n";
 		std::cout << "2. Right\n";
+		setColor(RED);
 		std::cout << "3. Exit to Menu\n";
-		std::cout << "Choice: ";
-		std::cin >> handChoice;
+		setColor(WHITE);
+		int handChoice = Input::GetNumber("Enter a number 1-3: ", 1, 3);
 
 		// Handle valid numeric choices
 		if (handChoice == 1)
@@ -110,38 +120,41 @@ void Game::StartGame()
 		}
 		else if (handChoice == 3)
 		{
-			return;
-		}
-		else
-		{
-			try
+			std::cout << "\nAre you sure you want to Exit to the Menu?\n";
+			std::cout << "1. No\n";
+			setColor(RED);
+			std::cout << "2. EXIT\n";
+			setColor(WHITE);
+
+			int exitChoice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
+			if (exitChoice == 1)
 			{
-				throw 1;
+				continue;
 			}
-			catch (...)
+			else if(exitChoice ==2)
 			{
-				std::system("cls");
-				std::cin.clear();
-				std::cin.ignore();
-				std::cout << "\nInvalid choice. Please choose a number 1-3.\n";
+				ClearScreen();
+				return;
 			}
 		}
 	}
 	
-	std::cout << "Great! Now press Enter to start playing";
-	std::cin.ignore();
+	std::cout << "Great! Now press Enter to start playing!";
 	std::cin.get();
 
-	std::system("cls");
+	ClearScreen();
 
 	// Clear scorecard and starts new gamne of 10 frames
 	_scorecard.Reset();
 	PlayFrames(10); 
 
+	setColor(BRIGHT_WHITE);
 	std::cout << "\nFinal Scorecard:\n";
+	setColor(YELLOW);
 	_scorecard.Display();
-	std::cout << "\nPress Enter to return to the menu.";
-	std::cin.get();
+	setColor(WHITE);
+	std::cout << "\nPress Enter to return to the Menu.";
+	EnterScreenClear();
 }
 
 void Game::Practice()
@@ -152,14 +165,15 @@ void Game::Practice()
 	std::cin >> frames;
 
 	// Resets the scorecard and plays they set number of frames
+	ClearScreen();
 	_scorecard.Reset();
 	PlayFrames(frames);
 
 	std::cout << "\nPractice Scorecard\n";
 	_scorecard.Display();
 
-	std::cout << "\nPress Enter to return to the menu.";
-	std::cin.get();
+	std::cout << "\nPress Enter to return to the Menu.";
+	EnterScreenClear();
 }
 
 void Game::PlayFrames(int count)
@@ -171,100 +185,149 @@ void Game::PlayFrames(int count)
 		return;
 	}
 
-	if (count > 10)
-	{
-		count = 10;
-	}
-
 	for (int i = 0; i < count and playing; i++) // rotates through number of frames. 10 for the game, and count number for practice
 	{
 		Frames& frame = _scorecard.GetCurrentFrame(); // shows the scorcard for that frame
 		_pinSet.Reset();
 
 		// cout bowler name with each frame
+		setColor(YELLOW);
 		std::cout << "Scorecard:\n";
+		setColor(CYAN);
 		std::cout << "Bowler: " << _bowler.GetName();
 		std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " of " << count << " ---\n";
 		std::cout << "============================\n";
 		std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
+		setColor(WHITE);
 
 		// First roll of frame
 		bool continuePlaying = PlayRoll(frame, 1);
+		bool tenthFrame = (frame.GetFrameNumber() == 10);
 
 		if (!continuePlaying) // quit playing
 		{
-			std::cout << "\nReturning to menu.";
+			ClearScreen();
 			return;
 		}
 
 		// second roll if user doesn't strike
-		if (!frame.IsStrike())
+		if (!frame.IsStrike() or tenthFrame)
 		{
+			if (tenthFrame and frame.IsStrike())
+			{
+				_pinSet.Reset();
+			}
+
+			std::cout << "\nPress Enter for second roll!";
+			EnterScreenClear();
 			continuePlaying = PlayRoll(frame, 2);
 
 			if (!continuePlaying)
 			{
-				std::cout << "\nReturning to menu.";
+				ClearScreen();
 				return;
 			}
 
 			if (frame.IsSpare())
 			{
+				setColor(YELLOW);
 				std::cout << "\nSPARE!\n";
+				setColor(WHITE);
 			}
 		}
 		else
 		{
+			setColor(GREEN);
 			std::cout << "\nSTRIKE!\n";
+			setColor(WHITE);
+		}
+
+		if (tenthFrame and (frame.IsStrike() or frame.IsSpare()))
+		{
+			_pinSet.Reset();
+			std::cout << "\n10th frame bonus roll! Press Enter to continue!";
+			EnterScreenClear();
+
+			continuePlaying = PlayRoll(frame, 3);
+
+			if (!continuePlaying)
+			{
+				ClearScreen();
+				return;
+			}
 		}
 
 		// Outputs the frame number and gets how many pins were knocked down to display to the user then advances to the next frame with a lear screen
 		std::cout << "\nFrame" << frame.GetFrameNumber() << " total pins: " << frame.GetPinsKnockedDown() << "\n";
 		std::cout << "Press Enter to continue";
-		std::cin.ignore();
-		std::cin.get();
-
-		std::system("cls");
+		EnterScreenClear();
 
 		if (i < count - 1)
 		{
 			_scorecard.AdvanceFrame();
 		}
 	}
-	// End of game, shows to total number of pins the user got for their score.
-	std::cout << "\nFinal score: " << _scorecard.GetTotalScore() << "\n";
 }
 
 // Gets the user input on if they want to rool. Which ball to use, and how to throw the ball
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
-	int choice;
+	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";
+	setColor(WHITE);
 
-	std::cout << "\nWhat would you like to do? Enter a number 1-2\n";
+	setColor(YELLOW);
 	std::cout << "1. Choose ball and roll\n";
-	std::cout << "2. Exit game to menu\n";
-	std::cout << "Choice: ";
-	std::cin >> choice;
+	std::cout << "2. Clean a ball\n";
+	setColor(RED);
+	std::cout << "3. Exit to Menu\n";
+	setColor(WHITE);
+	int choice = Input::GetNumber("Enter a number 1-3: ", 1, 3);
 
 	////// Add catch all user input vlaidation/////////
-	if (choice == 2) 
+	if (choice == 2)
 	{
-		return false;
+		Ball::Type type = SelectBall();
+		Ball& ball = GetBallByType(type);
+
+		ball.CleanBall();
+		std::cout << "\nBall cleaned!\n";
+		std::cout << "\nPress Enter to continue.";
+		EnterScreenClear();
+		return PlayRoll(frame, rollNumber);
 	}
 
+	if (choice == 3) 
+	{
+		std::cout << "\nAre you sure you want to Exit to the Menu?\n";
+		std::cout << "1. No\n";
+		setColor(RED);
+		std::cout << "2. EXIT\n";
+
+		setColor(WHITE);
+		int exitChoice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
+		if (exitChoice == 1)
+		{
+			return PlayRoll(frame, rollNumber);
+		}
+		else if (exitChoice == 2)
+		{
+			return false;
+		}
+	}
 	if (choice != 1)
 	{
 		std::cout << "\nInvalid choice. Please choose a number 1-2.\n";
 	}
 
-
 	Ball::Type ballType = SelectBall();
 	Roll::ThrowStyle throwStyle = SelectedThrowStyle();
-	Ball* ball = new Ball(ballType);
+	Ball* ball = &GetBallByType(ballType);
 	Roll* roll = new Roll(ball, throwStyle);
 
-	// Select ball
+	setColor(CYAN);
+	std::cout << "============================\n";
+	// Output ball used
 		switch (ballType)
 		{
 		case Ball::Type::Spare:
@@ -284,7 +347,7 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 			break;
 		}
 
-	// Select how to throw
+	// out put how ball was thrown
 	std::cout << "\nThrow: ";
 	if (throwStyle == Roll::ThrowStyle::Straight)
 	{
@@ -294,9 +357,11 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	{
 		std::cout << "Hook\n";
 	}
+	setColor(WHITE);
 
 	// Is an int because need the number of knocked pins but using the simulation method
 	int knocked = SimulateRoll(*ball, throwStyle, rollNumber);
+	(*ball).AddOil(10);
 	// is an int because need to know the number of standing pins from the PinSet class
 	int standing = _pinSet.GetStandingCount();
 
@@ -318,78 +383,66 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	// adds the second roll for the frame
 	frame.AddRoll(roll);
 
-	std::cout << "\nPins left standing\n";
+	std::cout << "\nPins left standing:\n";
 	_pinSet.Display();
 	std::cout << "\nYou knocked down " << knockedDown << " pins.\n";
 
 	return true;
 }
 
-// Ball selection menu
+// Ball selection
 Ball::Type Game::SelectBall()
 {
-	int choice;
-
-	std::cout << "\nChoose your ball. Enter a number 1-4\n";
-	std::cout << "1. Spare Ball\n";
-	std::cout << "2. Pearl Reactive\n";
-	std::cout << "3. Solid Reactive\n";
-	std::cout << "4. Urethane\n";
-	std::cout << "Choice: ";
-	std::cin >> choice;
-
-	switch (choice)
+	while (true)
 	{
-	case 1:
-		return Ball::Type::Spare;
+		setColor(YELLOW);
+		std::cout << "1. Spare Ball\n";
+		std::cout << "2. Pearl Reactive\n";
+		std::cout << "3. Solid Reactive\n";
+		std::cout << "4. Urethane\n";
+		setColor(WHITE);
+		int choice = Input::GetNumber("Enter a number 1-4: ", 1, 4);
 
-	case 2:
-		return Ball::Type::PearlReactive;
 
-	case 3:
-		return Ball::Type::SolidReactive;
-
-	case 4:
-		return Ball::Type::Urethane;
-
-	default:
-		try
+		switch (choice)
 		{
-			throw 1;
-		}
-		catch (...)
-		{
-			std::cin.clear();
-			std::cin.ignore();
+		case 1:
+			return Ball::Type::Spare;
+
+		case 2:
+			return Ball::Type::PearlReactive;
+
+		case 3:
+			return Ball::Type::SolidReactive;
+
+		case 4:
+			return Ball::Type::Urethane;
+
+		default:
 			std::cout << "\nInvalid choice. Please choose a number 1-4.\n";
+			break;
 		}
-		break;
 	}
 }
 
 
-// How to throw the ball menu selection
+// How to throw the ball selection
 Roll::ThrowStyle Game::SelectedThrowStyle()
 {
-	int choice;
-
-	std::cout << "\nChoose your throw:\n";
+	setColor(BRIGHT_WHITE);
 	std::cout << "1. Straight\n";
 	std::cout << "2. Hook\n";
-	std::cout << "Choice: ";
-	std::cin >> choice;
+	
+	int choice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
 
 	if (choice == 1)
 	{
 		return Roll::ThrowStyle::Straight;
 	}
-
 	if (choice == 2)
 	{
 		return Roll::ThrowStyle::Hook;
 	}
-
-	std::cout << "\nInvalid choice. Please enter a number 1-2\n";
 }
 
 
@@ -411,23 +464,23 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 	switch (ball.GetType())
 	{
 	case Ball::Type::Spare:
-		strikeChance = 5;
-		spareChance = 80;
+		strikeChance = 10;
+		spareChance = 75;
 		break;
 
 	case Ball::Type::PearlReactive:
-		strikeChance = 35;
-		spareChance = 20;
+		strikeChance = 40;
+		spareChance = 25;
 		break;
 
 	case Ball::Type::SolidReactive:
-		strikeChance = 20;
-		spareChance = 50;
+		strikeChance = 30;
+		spareChance = 25;
 		break;
 
 	case Ball::Type::Urethane:
-		strikeChance = 30;
-		spareChance = 50;
+		strikeChance = 35;
+		spareChance = 20;
 		break;
 	}
 
@@ -439,20 +492,30 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		{
 		case Ball::Type::Spare:
 			strikeChance += 0;
+			spareChance -= 25;
 			break;
 
 		case Ball::Type::PearlReactive:
 			strikeChance += 10;
+			spareChance -= 10;
 			break;
 
 		case Ball::Type::SolidReactive:
-			strikeChance += 5;
+			strikeChance += 10;
+			spareChance -= 5;
 			break;
 			
 		case Ball::Type::Urethane:
 			strikeChance += 5;
+			spareChance -= 10;
 			break;
 		}
+	}
+	if (style == Roll::ThrowStyle::Hook)
+	{
+		double effectiveness = ball.GetHookEffect();
+
+		strikeChance = static_cast<int>(strikeChance * effectiveness);
 	}
 
 	// Makes sure strike and spare chance don't go over 100
@@ -463,7 +526,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 	static std::mt19937 rng(std::random_device{}());
 	std::uniform_int_distribution<int> chanceRoll(1, 100);
 
-	if (rollNumber == 1 and standing == 10)
+	if (standing == 10)
 	{
 		if (chanceRoll(rng) <= strikeChance)
 		{
@@ -491,5 +554,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 // Outputs the leaderboard of player name and their scoere. Will need File I/O for this
 void Game::ShowLeaderboard()
 {
-	std::cout << "\nLeaderboard loading\n";
+	std::cout << "\nLeaderboard loading...\n";
+	std::cout << "Press Enter to return to Menu.";
+	EnterScreenClear();
 }

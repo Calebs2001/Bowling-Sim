@@ -63,7 +63,17 @@ End of week standup
 
 ### Week 3
 
-Stay tuned, this stand up is coming soon...
+Progress Update: Since last week I have completed fixing the game screen clearing back to the menu after the game ends or when quitting mid game. I have also added in score multiplying. Had to completely replace the GetTotalScore() to get the scores to multiply if a strike or spare is made so the score can go up to 300. Currently I am working on updating the Display() function for Scorecard to show the number of pins knocked in each frame, if it was a spare or strike that frame, and the score for that frame. It currently only shows the number of pins knocked that frame. This week I still need to accomplish improving user input validation at every area that requires user input. A bug/challenge I have encountered is that after updating the GetTotalScore() function the score was not updating as the user played through the frames. I found that everything was being stored but not being displayed. Refactoring Plan: One are that needs refactoring is the area I described above. Display() for the Scorecard only shows the total number of pins knocked down. It doesn't show the number of pins for the first or second throw, and it doesn't show the score from that frame if bonuses were added, or where the score was at for that frame, and if the frame was a spare or strike. Anther thing I need to refactor is user choice verification. It is very easy for the user to accidentally quit playing the game, so I need to add in a "Are you sure you want to quit?" prompt. Level Up Goal: This week I wan to level up on Refactoring. I think there are a lot of existing features that need to be adjusted or improved on. I will continue to play test the game and find areas where a function is lacking usability or if it has code that isn't needed.
+
+ Overview – What did you work on this past week? This week I worked on updating the Display() function to show the total number of pins knocked down in a frame, along with the total score from that frame, and if it was a strike or spare. I have also worked on adding the CleanBall() function to give the user more choices to change up the flow of the game. 
+ 
+  Improvements – What changes, refinements, or new features did you make? Some refactoring I have done is adding the ClearScreen() and EnterClear() method to make some code in the functions look a little less cluttered. I also made the changes that I described earlier for the Display() function 
+  
+  Challenges – What obstacles did you encounter, and how are you addressing them? An obstacle I encountered this week was encountering build errors and having to debug when refactoring the Display() function for my scorecard. One problem was that the scorecard wasn't updating after a throw or even a few throws. So I had to add some debugging code that would output the number of pins during the throw, and then got to the end of the scorecard and see that everything was being stored to find where my problem was. 
+  
+  Feedback – What feedback have you received, and how will it influence your next steps? Some feedback I have received feedback to add ASCII art to my project that is themed around bowling. I have a few ideas. 
+  
+  Next Steps – What is your primary goal for Week 4? My primary goal for this week is to improve the UI and adding ASCII art. I will also be testing the game more extensively.
 
 ### Week 4
 

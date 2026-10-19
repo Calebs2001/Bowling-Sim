@@ -8,7 +8,6 @@ Roll::Roll(Ball* selectedBall, ThrowStyle selectedStyle) :
 
 Roll::~Roll()
 {
-	delete _ball;
 	_ball = nullptr;
 }
 

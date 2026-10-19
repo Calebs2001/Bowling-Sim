@@ -5,6 +5,7 @@
 #include "Ball.h"
 #include "Roll.h"
 #include "Input.h"
+#include <vector>
 
 class Game
 {
@@ -21,14 +22,20 @@ private:
 	Scorecard _scorecard;
 	PinSet _pinSet;
 
+	// Base game and menus
 	void ShowMenu();
 	void StartGame();
 	void Practice();
 	void ShowLeaderboard();
 	void PlayFrames(int count);
 
+	//Playing game selection and sim managment
 	bool PlayRoll(Frames& frame, int rollNumber);
 	Ball::Type SelectBall();
 	Roll::ThrowStyle SelectedThrowStyle();
 	int SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber);
+
+	//Ball and oil managment
+	std::vector<Ball> _balls;
+	Ball& GetBallByType(Ball::Type type);
 };

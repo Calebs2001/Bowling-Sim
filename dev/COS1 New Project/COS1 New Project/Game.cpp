@@ -5,14 +5,8 @@
 #include "ASCII.h"
 #include "Input.h"
 
-Game::Game() :
-	_balls{ Ball(Ball::Type::Spare),
-			Ball(Ball::Type::PearlReactive),
-			Ball(Ball::Type::SolidReactive),
-			Ball(Ball::Type::Urethane)
-			}
-{  }
 
+//////////////////// METHODS /////////////////////////////
 Ball& Game::GetBallByType(Ball::Type type)
 {
 	for (Ball& ball : _balls)
@@ -35,6 +29,16 @@ void EnterScreenClear()
 	std::cin.get();
 	ClearScreen();
 }
+
+//////////////////// GAME /////////////////////////////
+Game::Game() :
+	_balls{ Ball(Ball::Type::Spare),
+			Ball(Ball::Type::PearlReactive),
+			Ball(Ball::Type::SolidReactive),
+			Ball(Ball::Type::Urethane)
+			}
+{  }
+
 
 void Game::Run()
 {
@@ -74,14 +78,17 @@ void Game::Run()
 	}
 }
 
+
 void Game::ShowMenu()
 {
 	drawMenuSign();
 	std::cout << "\n\n\n";
-	std::cout << "1. Start New Game\n";
+	std::cout << "1. Start New Game (10 frames)\n";
 	std::cout << "2. Practice\n";
 	std::cout << "3. Leaderboard\n";
+	setColor(RED);
 	std::cout << "4. Exit\n";
+	setColor(WHITE);
 }
 
 
@@ -150,12 +157,13 @@ void Game::StartGame()
 
 	setColor(BRIGHT_WHITE);
 	std::cout << "\nFinal Scorecard:\n";
-	setColor(YELLOW);
+	setColor(CYAN);
 	_scorecard.Display();
-	setColor(WHITE);
+	setColor(BRIGHT_WHITE);
 	std::cout << "\nPress Enter to return to the Menu.";
 	EnterScreenClear();
 }
+
 
 void Game::Practice()
 {
@@ -176,6 +184,7 @@ void Game::Practice()
 	EnterScreenClear();
 }
 
+
 void Game::PlayFrames(int count)
 {
 	bool playing = true;
@@ -189,16 +198,6 @@ void Game::PlayFrames(int count)
 	{
 		Frames& frame = _scorecard.GetCurrentFrame(); // shows the scorcard for that frame
 		_pinSet.Reset();
-
-		// cout bowler name with each frame
-		setColor(YELLOW);
-		std::cout << "Scorecard:\n";
-		setColor(CYAN);
-		std::cout << "Bowler: " << _bowler.GetName();
-		std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " of " << count << " ---\n";
-		std::cout << "============================\n";
-		std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
-		setColor(WHITE);
 
 		// First roll of frame
 		bool continuePlaying = PlayRoll(frame, 1);
@@ -227,19 +226,16 @@ void Game::PlayFrames(int count)
 				ClearScreen();
 				return;
 			}
-
+			// Frame was spare right after throw
 			if (frame.IsSpare())
 			{
-				setColor(YELLOW);
-				std::cout << "\nSPARE!\n";
-				setColor(WHITE);
+				DrawSpare();
 			}
 		}
+			// Frame was strike after throw
 		else
 		{
-			setColor(GREEN);
-			std::cout << "\nSTRIKE!\n";
-			setColor(WHITE);
+			DrawStrike();
 		}
 
 		if (tenthFrame and (frame.IsStrike() or frame.IsSpare()))
@@ -269,12 +265,19 @@ void Game::PlayFrames(int count)
 	}
 }
 
+
 // Gets the user input on if they want to rool. Which ball to use, and how to throw the ball
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
+	setColor(YELLOW);
+	std::cout << "Scorecard:\n";
+	setColor(CYAN);
+	std::cout << "Bowler: " << _bowler.GetName();
+	std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " ---\n";
+	std::cout << "============================\n";
+	std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
 	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";
-	setColor(WHITE);
 
 	setColor(YELLOW);
 	std::cout << "1. Choose ball and roll\n";
@@ -299,7 +302,9 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 
 	if (choice == 3) 
 	{
+		setColor(BRIGHT_WHITE);
 		std::cout << "\nAre you sure you want to Exit to the Menu?\n";
+		setColor(YELLOW);
 		std::cout << "1. No\n";
 		setColor(RED);
 		std::cout << "2. EXIT\n";
@@ -390,6 +395,7 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	return true;
 }
 
+
 // Ball selection
 Ball::Type Game::SelectBall()
 {
@@ -429,9 +435,10 @@ Ball::Type Game::SelectBall()
 // How to throw the ball selection
 Roll::ThrowStyle Game::SelectedThrowStyle()
 {
-	setColor(BRIGHT_WHITE);
+	setColor(YELLOW);
 	std::cout << "1. Straight\n";
 	std::cout << "2. Hook\n";
+	setColor(WHITE);
 	
 	int choice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
 
@@ -469,7 +476,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		break;
 
 	case Ball::Type::PearlReactive:
-		strikeChance = 40;
+		strikeChance = 45;
 		spareChance = 25;
 		break;
 
@@ -491,12 +498,12 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		switch (ball.GetType())
 		{
 		case Ball::Type::Spare:
-			strikeChance += 0;
+			strikeChance += 2;
 			spareChance -= 25;
 			break;
 
 		case Ball::Type::PearlReactive:
-			strikeChance += 10;
+			strikeChance += 12;
 			spareChance -= 10;
 			break;
 
@@ -506,7 +513,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 			break;
 			
 		case Ball::Type::Urethane:
-			strikeChance += 5;
+			strikeChance += 15;
 			spareChance -= 10;
 			break;
 		}
@@ -558,3 +565,4 @@ void Game::ShowLeaderboard()
 	std::cout << "Press Enter to return to Menu.";
 	EnterScreenClear();
 }
+

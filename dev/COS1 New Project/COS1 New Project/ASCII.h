@@ -41,6 +41,40 @@ using namespace std;
         SetConsoleTextAttribute(consoleHandle, color);
     }
 
+    void DrawStrike()
+    {
+        setColor(GREEN);
+
+        cout << R"(  
+  _____ _______ _____  _____ _  __
+ / ____|__   __|  __ \|_   _| |/ /
+| (___    | |  | |__) | | | | ' /
+ \___ \   | |  |  _  /  | | |  <
+ ____) |  | |  | | \ \ _| |_| . \
+|_____/   |_|  |_|  \_\_____|_|\_\
+
+         *** STRIKE! ***
+       ALL TEN PINS DOWN!
+)";
+        setColor(WHITE);
+    }
+
+    void DrawSpare()
+    {
+        setColor(YELLOW);
+
+        cout << R"(
++--------------------------+
+|                          |
+|         S P A R E !      |
+|                          |
+|      NICE CONVERSION     |
++--------------------------+
+)";
+
+        setColor(WHITE);
+    }
+
     void moveCursor(int x, int y)
     {
         COORD pos;

@@ -75,6 +75,22 @@ using namespace std;
         setColor(WHITE);
     }
 
+    void DrawGutterBall()
+    {
+        setColor(RED);
+
+        cout << R"(
+      .--------.
+     /  X   X   \
+    |     ___    |
+    |   GUTTER!  |
+     \__________/
+
+   The pins remain undefeated.
+)";
+        setColor(WHITE);
+    }
+
     void moveCursor(int x, int y)
     {
         COORD pos;

@@ -392,6 +392,11 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	_pinSet.Display();
 	std::cout << "\nYou knocked down " << knockedDown << " pins.\n";
 
+	if (knockedDown == 0)
+	{
+		DrawGutterBall();
+	}
+
 	return true;
 }
 

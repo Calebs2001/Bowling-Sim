@@ -184,6 +184,7 @@ void Scorecard::Display() const
 		if (count == 0)
 		{
 			std::cout << " ?  |";
+			continue;
 		}
 		else
 		{
@@ -195,27 +196,41 @@ void Scorecard::Display() const
 			}
 			else
 			{
-				std::cout << " " << (first == 0 ? '-' : '0' + first);
-
-				if (count >= 2)
+				if (first == 0)
 				{
-					int second = frame.GetRollPins(1);
-
-					if (first + second == 10)
-					{
-						std::cout << "/";
-					}
-					else
-					{
-						std::cout << (second == 0 ? '-' : '0' + second);
-					}
+					std::cout << " -";
 				}
 				else
 				{
-					std::cout << " ";
+					std::cout << " " << first;
 				}
-				std::cout << " |";
 			}
+
+			if (count >= 2)
+			{
+				int second = frame.GetRollPins(1);
+
+				if (first + second == 10)
+				{
+					std::cout << "/";
+				}
+				else
+				{
+					if (second == 0)
+					{
+						std::cout << "-";
+					}
+					else
+					{
+						std::cout << static_cast<char>('0' + second);
+					}
+				}
+			}
+			else
+			{
+				std::cout << " ";
+			}
+			std::cout << " |";
 		}
 	}
 	std::cout << "\n| Total  |";

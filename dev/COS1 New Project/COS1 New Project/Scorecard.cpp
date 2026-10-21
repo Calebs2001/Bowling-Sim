@@ -102,7 +102,6 @@ void Scorecard::Reset()
 
 void Scorecard::Display() const
 {
-	std::cout << "\n======================== SCORECARD ========================\n";
 	std::vector<int> rolls;
 
 	for (const Frames& frame : _frames)
@@ -159,16 +158,32 @@ void Scorecard::Display() const
 		frameScores[frameIndex] = total;
 		scoreReady[frameIndex] = true;
 	}
+	std::cout << "\n+----------------------------------------------------------+\n";
+	std::cout << "|                           SCOREBOARD                     |\n";
+	std::cout << "+----------------------------------------------------------+\n";
+	std::cout << "| Frame  |";
+
+	for (int i = 1; i <= 10; ++i)
+	{
+		std::cout << " " << i << "  |";
+	}
+
+	std::cout << "\n|--------+";
+
+	for(int i = 0; i < 10; ++i)
+	{
+		std::cout << "----+";;
+	}
+
+	std::cout << "\n| Rolls  |";
+
 	for (const Frames& frame : _frames)
 	{
-		int frameNumber = frame.GetFrameNumber();
 		int count = frame.GetRollCount();
-
-		std::cout << "\nFrame " << frameNumber << ": ";
 
 		if (count == 0)
 		{
-			std::cout << "-";
+			std::cout << " ?  |";
 		}
 		else
 		{
@@ -176,29 +191,47 @@ void Scorecard::Display() const
 
 			if (first == 10)
 			{
-				std::cout << "X (Strike)";
+				std::cout << " X  |";
 			}
 			else
 			{
-				std::cout << first;
+				std::cout << " " << (first == 0 ? '-' : '0' + first);
 
 				if (count >= 2)
 				{
 					int second = frame.GetRollPins(1);
 
 					if (first + second == 10)
-						std::cout << " / (Spare)";
+					{
+						std::cout << "/";
+					}
 					else
-						std::cout << " " << second;
+					{
+						std::cout << (second == 0 ? '-' : '0' + second);
+					}
 				}
+				else
+				{
+					std::cout << " ";
+				}
+				std::cout << " |";
 			}
 		}
-		if (scoreReady[frameNumber - 1])
-			std::cout << " | Score: " << frameScores[frameNumber - 1];
-		else
-			std::cout << " | Score: Pending";
 	}
-	std::cout << "\n-----------------------------------------------------------\n";
+	std::cout << "\n| Total  |";
+
+	for (int i = 0; i < 10; ++i)
+	{
+		if (scoreReady[i])
+		{
+			std::cout << " " << frameScores[i] << " |";
+		}
+		else
+		{
+			std::cout << " .. |";
+		}
+	}
+	std::cout << "\n+----------------------------------------------------------+\n";
 	std::cout << "Final Total: " << GetTotalScore() << "\n";
 }
 

@@ -140,6 +140,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ASCII.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Bowler.cpp" />
     <ClCompile Include="Frames.cpp" />

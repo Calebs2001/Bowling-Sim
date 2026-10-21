@@ -270,12 +270,16 @@ void Game::PlayFrames(int count)
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
 	setColor(YELLOW);
-	std::cout << "Scorecard:\n";
+	std::cout << "\n+---------------------------------------------------+\n";
+	std::cout << "|                    SCOREBOARD                     |\n";
+	std::cout << "+---------------------------------------------------+\n";
+
 	setColor(CYAN);
-	std::cout << "Bowler: " << _bowler.GetName();
-	std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " ---\n";
-	std::cout << "============================\n";
-	std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
+	std::cout << "| Bowler: " << _bowler.GetName() << "\n";
+	std::cout << "| Current Frame: " << _scorecard.GetCurrentFrameNumber() << "\n";
+	std::cout << "+---------------------------------------------------+\n";
+
+	_scorecard.Display();
 	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";
 

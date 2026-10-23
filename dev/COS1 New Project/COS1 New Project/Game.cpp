@@ -4,6 +4,10 @@
 #include <iomanip>
 #include <algorithm>
 #include <string>
+#include <fstream>
+#include <vector>
+#include <utility>
+#include <limits>
 #include "Game.h"
 #include "ASCII.h"
 #include "Input.h"
@@ -56,6 +60,23 @@ void DrawInfoBox(const std::string& name, int frameNumber)
 	std::cout << "|" << std::left << std::setw(width) << frameLine << "|\n";
 
 	std::cout << "+" << std::setw(width) << frameLine << "|\n";
+}
+
+void Game::SaveScore()
+{
+	std::ofstream outFile("leaderboard.txt", std::ios::app);
+
+	if (!outFile.is_open())
+	{
+		std::cout << "\nError: Could not save the score.\n";
+		return;
+	}
+
+	outFile << _bowler.GetName() << '\t' << _scorecard.GetTotalScore() << '\n';
+
+	outFile.close();
+
+	std::cout << "\nScore saved to the leaderboard!\n";
 }
 
 //////////////////// GAME /////////////////////////////
@@ -181,12 +202,18 @@ void Game::StartGame()
 
 	// Clear scorecard and starts new gamne of 10 frames
 	_scorecard.Reset();
-	PlayFrames(10); 
+	bool completed = PlayFrames(10); 
+
+	if (!completed)
+	{
+		return;
+	}
 
 	setColor(BRIGHT_WHITE);
 	std::cout << "\nFinal Scorecard:\n";
 	setColor(CYAN);
 	_scorecard.Display();
+	SaveScore();
 	setColor(BRIGHT_WHITE);
 	std::cout << "\nPress Enter to return to the Menu.";
 	EnterScreenClear();
@@ -213,13 +240,13 @@ void Game::Practice()
 }
 
 
-void Game::PlayFrames(int count)
+bool Game::PlayFrames(int count)
 {
 	bool playing = true;
 
 	if (count < 1) // if frames left is less than one returns and moves on to show scorecard
 	{
-		return;
+		return false;
 	}
 
 	for (int i = 0; i < count and playing; i++) // rotates through number of frames. 10 for the game, and count number for practice
@@ -234,7 +261,7 @@ void Game::PlayFrames(int count)
 		if (!continuePlaying) // quit playing
 		{
 			ClearScreen();
-			return;
+			return false;
 		}
 
 		// second roll if user doesn't strike
@@ -252,7 +279,7 @@ void Game::PlayFrames(int count)
 			if (!continuePlaying)
 			{
 				ClearScreen();
-				return;
+				return false;
 			}
 			// Frame was spare right after throw
 			if (frame.IsSpare())
@@ -277,7 +304,7 @@ void Game::PlayFrames(int count)
 			if (!continuePlaying)
 			{
 				ClearScreen();
-				return;
+				return false;
 			}
 		}
 
@@ -291,6 +318,7 @@ void Game::PlayFrames(int count)
 			_scorecard.AdvanceFrame();
 		}
 	}
+	return true;
 }
 
 
@@ -592,8 +620,59 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 // Outputs the leaderboard of player name and their scoere. Will need File I/O for this
 void Game::ShowLeaderboard()
 {
-	std::cout << "\nLeaderboard loading...\n";
-	std::cout << "Press Enter to return to Menu.";
+	std::ifstream inFile("leaderboard.txt");
+
+	if (!inFile.is_open())
+	{
+		std::cout << "\nNo leaderboard scores were found.\n";
+		std::cout << "\nFinish a game to add score.\n";
+		std::cout << "Press Enter to return to Menu.";
+		EnterScreenClear();
+		return;
+	}
+
+	std::vector<std::pair<std::string, int>> scores;
+
+	std::string name;
+	int score;
+
+	while (std::getline(inFile, name, '\t'))
+	{
+		if (!(inFile >> score))
+		{
+			break;
+		}
+
+		inFile.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+
+		scores.push_back({ name, score });
+	}
+
+	inFile.close();
+
+	std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b)
+		{
+			return a.second > b.second;
+		});
+
+	std::cout << "\n========== LEADERBOARD ==========\n\n";
+
+	if (scores.empty())
+	{
+		std::cout << "No scores have been saved yet.\n";
+	}
+	else
+	{
+		std::cout << std::left << std::setw(8) << "Rank" << std::setw(25) << "Player" << "Score\n";
+		std::cout << "-------------------------------------------- - \n";
+
+		for (size_t i = 0; i < scores.size(); ++i)
+		{
+			std::cout << std::left << std::setw(8) << (i + 1) << std::setw(25) << scores[i].first << scores[i].second << '\n';
+		}
+	}
+
+	std::cout << "\nPress Enter to return to Menu.";
 	EnterScreenClear();
 }
 

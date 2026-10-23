@@ -27,7 +27,7 @@ private:
 	void StartGame();
 	void Practice();
 	void ShowLeaderboard();
-	void PlayFrames(int count);
+	bool PlayFrames(int count);
 
 	//Playing game selection and sim managment
 	bool PlayRoll(Frames& frame, int rollNumber);
@@ -38,4 +38,6 @@ private:
 	//Ball and oil managment
 	std::vector<Ball> _balls;
 	Ball& GetBallByType(Ball::Type type);
+
+	void SaveScore();
 };

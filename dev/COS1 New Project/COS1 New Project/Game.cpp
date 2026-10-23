@@ -1,18 +1,19 @@
 #include <iostream>
 #include <cstdlib>
 #include <random>
+#include <iomanip>
+#include <algorithm>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <utility>
+#include <limits>
 #include "Game.h"
 #include "ASCII.h"
 #include "Input.h"
 
-Game::Game() :
-	_balls{ Ball(Ball::Type::Spare),
-			Ball(Ball::Type::PearlReactive),
-			Ball(Ball::Type::SolidReactive),
-			Ball(Ball::Type::Urethane)
-			}
-{  }
 
+//////////////////// METHODS /////////////////////////////
 Ball& Game::GetBallByType(Ball::Type type)
 {
 	for (Ball& ball : _balls)
@@ -35,6 +36,58 @@ void EnterScreenClear()
 	std::cin.get();
 	ClearScreen();
 }
+
+void DrawInfoBox(const std::string& name, int frameNumber)
+{
+	const std::string bowlerLine = "Bowler: " + name;
+	const std::string frameLine = "Current Frame: " + std::to_string(frameNumber);
+
+	size_t width = 49;
+
+	if (bowlerLine.size() > width)
+	{
+		width = bowlerLine.size();
+	}
+	if (frameLine.size() > width)
+	{
+		width = frameLine.size();
+	}
+
+	std::cout << "+" << std::string(width, '-') << "+\n";
+
+	std::cout << "|" << std::left << std::setw(width) << bowlerLine << "|\n";
+
+	std::cout << "|" << std::left << std::setw(width) << frameLine << "|\n";
+
+	std::cout << "+" << std::setw(width) << frameLine << "|\n";
+}
+
+void Game::SaveScore()
+{
+	std::ofstream outFile("leaderboard.txt", std::ios::app);
+
+	if (!outFile.is_open())
+	{
+		std::cout << "\nError: Could not save the score.\n";
+		return;
+	}
+
+	outFile << _bowler.GetName() << '\t' << _scorecard.GetTotalScore() << '\n';
+
+	outFile.close();
+
+	std::cout << "\nScore saved to the leaderboard!\n";
+}
+
+//////////////////// GAME /////////////////////////////
+Game::Game() :
+	_balls{ Ball(Ball::Type::Spare),
+			Ball(Ball::Type::PearlReactive),
+			Ball(Ball::Type::SolidReactive),
+			Ball(Ball::Type::Urethane)
+			}
+{  }
+
 
 void Game::Run()
 {
@@ -74,14 +127,17 @@ void Game::Run()
 	}
 }
 
+
 void Game::ShowMenu()
 {
 	drawMenuSign();
 	std::cout << "\n\n\n";
-	std::cout << "1. Start New Game\n";
+	std::cout << "1. Start New Game (10 frames)\n";
 	std::cout << "2. Practice\n";
 	std::cout << "3. Leaderboard\n";
+	setColor(RED);
 	std::cout << "4. Exit\n";
+	setColor(WHITE);
 }
 
 
@@ -146,16 +202,23 @@ void Game::StartGame()
 
 	// Clear scorecard and starts new gamne of 10 frames
 	_scorecard.Reset();
-	PlayFrames(10); 
+	bool completed = PlayFrames(10); 
+
+	if (!completed)
+	{
+		return;
+	}
 
 	setColor(BRIGHT_WHITE);
 	std::cout << "\nFinal Scorecard:\n";
-	setColor(YELLOW);
+	setColor(CYAN);
 	_scorecard.Display();
-	setColor(WHITE);
+	SaveScore();
+	setColor(BRIGHT_WHITE);
 	std::cout << "\nPress Enter to return to the Menu.";
 	EnterScreenClear();
 }
+
 
 void Game::Practice()
 {
@@ -176,29 +239,20 @@ void Game::Practice()
 	EnterScreenClear();
 }
 
-void Game::PlayFrames(int count)
+
+bool Game::PlayFrames(int count)
 {
 	bool playing = true;
 
 	if (count < 1) // if frames left is less than one returns and moves on to show scorecard
 	{
-		return;
+		return false;
 	}
 
 	for (int i = 0; i < count and playing; i++) // rotates through number of frames. 10 for the game, and count number for practice
 	{
 		Frames& frame = _scorecard.GetCurrentFrame(); // shows the scorcard for that frame
 		_pinSet.Reset();
-
-		// cout bowler name with each frame
-		setColor(YELLOW);
-		std::cout << "Scorecard:\n";
-		setColor(CYAN);
-		std::cout << "Bowler: " << _bowler.GetName();
-		std::cout << "\n--- Frame " << _scorecard.GetCurrentFrameNumber() << " of " << count << " ---\n";
-		std::cout << "============================\n";
-		std::cout << "Current score: " << _scorecard.GetTotalScore() << "\n";
-		setColor(WHITE);
 
 		// First roll of frame
 		bool continuePlaying = PlayRoll(frame, 1);
@@ -207,7 +261,7 @@ void Game::PlayFrames(int count)
 		if (!continuePlaying) // quit playing
 		{
 			ClearScreen();
-			return;
+			return false;
 		}
 
 		// second roll if user doesn't strike
@@ -225,21 +279,18 @@ void Game::PlayFrames(int count)
 			if (!continuePlaying)
 			{
 				ClearScreen();
-				return;
+				return false;
 			}
-
+			// Frame was spare right after throw
 			if (frame.IsSpare())
 			{
-				setColor(YELLOW);
-				std::cout << "\nSPARE!\n";
-				setColor(WHITE);
+				DrawSpare();
 			}
 		}
+			// Frame was strike after throw
 		else
 		{
-			setColor(GREEN);
-			std::cout << "\nSTRIKE!\n";
-			setColor(WHITE);
+			DrawStrike();
 		}
 
 		if (tenthFrame and (frame.IsStrike() or frame.IsSpare()))
@@ -253,7 +304,7 @@ void Game::PlayFrames(int count)
 			if (!continuePlaying)
 			{
 				ClearScreen();
-				return;
+				return false;
 			}
 		}
 
@@ -267,14 +318,20 @@ void Game::PlayFrames(int count)
 			_scorecard.AdvanceFrame();
 		}
 	}
+	return true;
 }
+
 
 // Gets the user input on if they want to rool. Which ball to use, and how to throw the ball
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
+	setColor(YELLOW);
+	DrawInfoBox(_bowler.GetName(), _scorecard.GetCurrentFrameNumber());
+
+	setColor(CYAN);
+	_scorecard.Display();
 	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";
-	setColor(WHITE);
 
 	setColor(YELLOW);
 	std::cout << "1. Choose ball and roll\n";
@@ -299,7 +356,9 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 
 	if (choice == 3) 
 	{
+		setColor(BRIGHT_WHITE);
 		std::cout << "\nAre you sure you want to Exit to the Menu?\n";
+		setColor(YELLOW);
 		std::cout << "1. No\n";
 		setColor(RED);
 		std::cout << "2. EXIT\n";
@@ -387,8 +446,14 @@ bool Game::PlayRoll(Frames& frame, int rollNumber)
 	_pinSet.Display();
 	std::cout << "\nYou knocked down " << knockedDown << " pins.\n";
 
+	if (knockedDown == 0)
+	{
+		DrawGutterBall();
+	}
+
 	return true;
 }
+
 
 // Ball selection
 Ball::Type Game::SelectBall()
@@ -429,9 +494,10 @@ Ball::Type Game::SelectBall()
 // How to throw the ball selection
 Roll::ThrowStyle Game::SelectedThrowStyle()
 {
-	setColor(BRIGHT_WHITE);
+	setColor(YELLOW);
 	std::cout << "1. Straight\n";
 	std::cout << "2. Hook\n";
+	setColor(WHITE);
 	
 	int choice = Input::GetNumber("Enter a number 1-2: ", 1, 2);
 
@@ -469,7 +535,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		break;
 
 	case Ball::Type::PearlReactive:
-		strikeChance = 40;
+		strikeChance = 45;
 		spareChance = 25;
 		break;
 
@@ -491,12 +557,12 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 		switch (ball.GetType())
 		{
 		case Ball::Type::Spare:
-			strikeChance += 0;
+			strikeChance += 2;
 			spareChance -= 25;
 			break;
 
 		case Ball::Type::PearlReactive:
-			strikeChance += 10;
+			strikeChance += 12;
 			spareChance -= 10;
 			break;
 
@@ -506,7 +572,7 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 			break;
 			
 		case Ball::Type::Urethane:
-			strikeChance += 5;
+			strikeChance += 15;
 			spareChance -= 10;
 			break;
 		}
@@ -554,7 +620,59 @@ int Game::SimulateRoll(const Ball& ball, Roll::ThrowStyle style, int rollNumber)
 // Outputs the leaderboard of player name and their scoere. Will need File I/O for this
 void Game::ShowLeaderboard()
 {
-	std::cout << "\nLeaderboard loading...\n";
-	std::cout << "Press Enter to return to Menu.";
+	std::ifstream inFile("leaderboard.txt");
+
+	if (!inFile.is_open())
+	{
+		std::cout << "\nNo leaderboard scores were found.\n";
+		std::cout << "\nFinish a game to add score.\n";
+		std::cout << "Press Enter to return to Menu.";
+		EnterScreenClear();
+		return;
+	}
+
+	std::vector<std::pair<std::string, int>> scores;
+
+	std::string name;
+	int score;
+
+	while (std::getline(inFile, name, '\t'))
+	{
+		if (!(inFile >> score))
+		{
+			break;
+		}
+
+		inFile.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+
+		scores.push_back({ name, score });
+	}
+
+	inFile.close();
+
+	std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b)
+		{
+			return a.second > b.second;
+		});
+
+	std::cout << "\n========== LEADERBOARD ==========\n\n";
+
+	if (scores.empty())
+	{
+		std::cout << "No scores have been saved yet.\n";
+	}
+	else
+	{
+		std::cout << std::left << std::setw(8) << "Rank" << std::setw(25) << "Player" << "Score\n";
+		std::cout << "-------------------------------------------- - \n";
+
+		for (size_t i = 0; i < scores.size(); ++i)
+		{
+			std::cout << std::left << std::setw(8) << (i + 1) << std::setw(25) << scores[i].first << scores[i].second << '\n';
+		}
+	}
+
+	std::cout << "\nPress Enter to return to Menu.";
 	EnterScreenClear();
 }
+

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "PinSet.h"
+#include "ASCII.h"
 
 PinSet::PinSet()
 {
@@ -50,19 +51,58 @@ void PinSet::KnockDown(int pinNumber)
 
 void PinSet::Display() const
 {
-	std::cout << "\nPins: ";
+	std::cout << "\n       PINS REMAINING\n\n";
 
-	for (const Pin& pin : _pins)
+	int standing = GetStandingCount();
+
+	if (standing == 0)
 	{
-		if (pin.GetIsStanding())
-		{
-			std::cout << pin.GetNumber() << " ";
-		}
-		else
-		{
-			std::cout << ". ";
-		}
+		setColor(GREEN);
+		std::cout << "          ALL PINS CLEARED!\n";
+		std::cout << "             \\ O /\n";
+		std::cout << "               |\n";
+		std::cout << "              / \\\n";
+		setColor(WHITE);
 	}
-	std::cout << "\n";
+	else
+	{
+		const int pinNumbers[4][4] =
+		{
+			{ 7, 0, 0, 0 },
+			{ 4, 8, 0, 0 },
+			{ 2, 5, 9, 0 },
+			{ 1, 3, 6, 10 }
+		};
+
+		for (int row = 0; row < 4; ++row)
+		{
+			for (int space = 0; space < (3 - row) * 2; ++space)
+			{
+				std::cout << ' ';
+			}
+
+			for (int col = 0; col <= row; ++col)
+			{
+				int pinNumber = pinNumbers[row][col];
+
+				if (GetIsStanding(pinNumber))
+				{
+					setColor(BRIGHT_WHITE);
+					std::cout << "O";
+				}
+				else
+				{
+					setColor(RED);
+					std::cout << "x";
+				}
+
+				std::cout << "   ";
+			}
+
+			std::cout << '\n';
+		}
+		std::cout << "\n     Standing: " << standing << " / 10\n";
+		setColor(WHITE);
+	}
 }
 

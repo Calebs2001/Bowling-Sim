@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <random>
+#include <iomanip>
+#include <algorithm>
+#include <string>
 #include "Game.h"
 #include "ASCII.h"
 #include "Input.h"
@@ -28,6 +31,31 @@ void EnterScreenClear()
 {
 	std::cin.get();
 	ClearScreen();
+}
+
+void DrawInfoBox(const std::string& name, int frameNumber)
+{
+	const std::string bowlerLine = "Bowler: " + name;
+	const std::string frameLine = "Current Frame: " + std::to_string(frameNumber);
+
+	size_t width = 49;
+
+	if (bowlerLine.size() > width)
+	{
+		width = bowlerLine.size();
+	}
+	if (frameLine.size() > width)
+	{
+		width = frameLine.size();
+	}
+
+	std::cout << "+" << std::string(width, '-') << "+\n";
+
+	std::cout << "|" << std::left << std::setw(width) << bowlerLine << "|\n";
+
+	std::cout << "|" << std::left << std::setw(width) << frameLine << "|\n";
+
+	std::cout << "+" << std::setw(width) << frameLine << "|\n";
 }
 
 //////////////////// GAME /////////////////////////////
@@ -270,15 +298,9 @@ void Game::PlayFrames(int count)
 bool Game::PlayRoll(Frames& frame, int rollNumber)
 {
 	setColor(YELLOW);
-	std::cout << "\n+---------------------------------------------------+\n";
-	std::cout << "|                    SCOREBOARD                     |\n";
-	std::cout << "+---------------------------------------------------+\n";
+	DrawInfoBox(_bowler.GetName(), _scorecard.GetCurrentFrameNumber());
 
 	setColor(CYAN);
-	std::cout << "| Bowler: " << _bowler.GetName() << "\n";
-	std::cout << "| Current Frame: " << _scorecard.GetCurrentFrameNumber() << "\n";
-	std::cout << "+---------------------------------------------------+\n";
-
 	_scorecard.Display();
 	setColor(BRIGHT_WHITE);
 	std::cout << "Roll " << rollNumber << "\n";

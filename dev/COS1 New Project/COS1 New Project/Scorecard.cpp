@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <iomanip>
 #include "Scorecard.h"
 
 Scorecard::Scorecard() :
@@ -158,95 +160,121 @@ void Scorecard::Display() const
 		frameScores[frameIndex] = total;
 		scoreReady[frameIndex] = true;
 	}
-	std::cout << "\n+----------------------------------------------------------+\n";
-	std::cout << "|                           SCOREBOARD                     |\n";
-	std::cout << "+----------------------------------------------------------+\n";
-	std::cout << "| Frame  |";
+
+	const int labelWidth = 8;
+	const int frameWidth = 6;
+
+	std::cout << "+" << std::string(labelWidth, '-');
+	for (int i = 0; i < 10; ++i)
+	{
+		std::cout << "+" << std::string(frameWidth, '-');
+	}
+	std::cout << "+\n";
+
+	std::cout << "|" << std::left << std::setw(labelWidth - 1) << "Frame" << "|";
 
 	for (int i = 1; i <= 10; ++i)
 	{
-		std::cout << " " << i << "  |";
+		std::cout << std::right << std::setw(frameWidth) <<  i << "|";
 	}
+	std::cout << "\n";
 
-	std::cout << "\n|--------+";
-
-	for(int i = 0; i < 10; ++i)
+	std::cout << "+" << std::string(frameWidth, '-');
+	for (int i = 0; i < 10; ++i)
 	{
-		std::cout << "----+";;
+		std::cout << "+" << std::string(frameWidth, '-');
 	}
+	std::cout << "+\n";
 
-	std::cout << "\n| Rolls  |";
+	std::cout << "|" << std::left << std::setw(labelWidth) << "Rolls" << "|";
 
 	for (const Frames& frame : _frames)
 	{
 		int count = frame.GetRollCount();
+		std::string rollsText = "?";
 
-		if (count == 0)
-		{
-			std::cout << " ?  |";
-			continue;
-		}
-		else
+		if (count > 0)
 		{
 			int first = frame.GetRollPins(0);
-
+			
 			if (first == 10)
 			{
-				std::cout << " X  |";
+				rollsText = "X";
+			}
+			else if (first == 0)
+			{
+				rollsText = "-";
 			}
 			else
 			{
-				if (first == 0)
-				{
-					std::cout << " -";
-				}
-				else
-				{
-					std::cout << " " << first;
-				}
+				rollsText = std::to_string(first);
 			}
 
 			if (count >= 2)
 			{
 				int second = frame.GetRollPins(1);
 
-				if (first + second == 10)
+				if (first != 10)
 				{
-					std::cout << "/";
-				}
-				else
-				{
-					if (second == 0)
+					if (first + second == 10)
 					{
-						std::cout << "-";
+						rollsText += "/";
+					}
+					else if (second == 0)
+					{
+						rollsText += "-";
 					}
 					else
 					{
-						std::cout << static_cast<char>('0' + second);
+						rollsText += std::to_string(second);
+					}
+				}
+				else
+				{
+					if (second == 10)
+					{
+						rollsText += "X";
+					}
+					else if (second == 0)
+					{
+						rollsText += "-";
+					}
+					else
+					{
+						rollsText += std::to_string(second);
 					}
 				}
 			}
-			else
-			{
-				std::cout << " ";
-			}
-			std::cout << " |";
 		}
+
+		std::cout << std::right << std::setw(frameWidth) << rollsText << "|";
 	}
-	std::cout << "\n| Total  |";
+	std::cout << "\n";
+
+	std::cout << "+" << std::string(labelWidth, '-');
+	for (int i = 0; i < 10; i++)
+	{
+		std::cout << "+" << std::string(frameWidth, '-');
+	}
+	std::cout << "+\n";
+
+	std::cout << "|" << std::left << std::setw(labelWidth) <<  "Total" << "|";
 
 	for (int i = 0; i < 10; ++i)
 	{
-		if (scoreReady[i])
-		{
-			std::cout << " " << frameScores[i] << " |";
-		}
-		else
-		{
-			std::cout << " .. |";
-		}
+		std::string score = scoreReady[i] ? std::to_string(frameScores[i]) : "";
+
+		std::cout << std::right << std::setw(frameWidth) << score << "|";
 	}
-	std::cout << "\n+----------------------------------------------------------+\n";
+	std::cout << "\n";
+
+	std::cout << "+" << std::string(labelWidth, '-');
+	for (int i = 0; i < 10; ++i)
+	{
+		std::cout << "+" << std::string(frameWidth, '-');
+	}
+	std::cout << "+\n";
+
 	std::cout << "Final Total: " << GetTotalScore() << "\n";
 }
 
